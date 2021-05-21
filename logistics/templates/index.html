@@ -3,6 +3,49 @@
 <!DOCTYPE html>
 <html lang="en">
 
+<style>
+  .card {
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    width: 100%;
+    height: 10%;
+  }
+  
+  .card:hover {
+    box-shadow: 0 8px 16px 0 rgba(65, 63, 63, 0.2);
+  }
+  
+  .container {
+    padding: 2px 16px;
+    
+  }
+
+  .column {
+    float: left;
+    width: 28%;
+    padding: 20px 25px;
+  }
+
+  /* Remove extra left and right margins, due to padding */
+  .row {
+    margin: 0 auto;
+    
+  }
+
+  /* Clear floats after the columns */
+  .row:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+
+  .img {
+    width: 200px;
+    height: 300px;
+  }
+
+  </style>
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -27,7 +70,7 @@
 
 
   <!-- main css -->
-  <link rel="stylesheet" type="text/css" href="{% static "index.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'index.css' %}" />
 
 
   <!-- message here -->
@@ -36,6 +79,7 @@
   {% for message in messages %}
 
   <script>
+    M.toast({html: "{{ message }}"})
     alert("{{ message }}");
   </script>
 
@@ -72,42 +116,78 @@
         </div>
         <div class="collapse navbar-collapse" id="mainNavBar">
           <ul class="nav navbar-nav navbar-right">
-            <!-- {% if user.is_authenticated %}
+            {% if user.is_authenticated %}
             <li><a href="/Home">Home</a></li>
-            <li><a href="/logout/"><span class="glyphicon glyphicon-log-out"></span> &nbsp; Logout</a></li>
+            <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span> &nbsp; Logout</a></li>
             {% else %}
             <li><a href="/">Home</a></li>
-            <li><a href="/register/"><span class="glyphicon glyphicon-user"></span> &nbsp; Sign up</a></li>
-            <li><a href="/login/"><span class="glyphicon glyphicon-log-in"></span> &nbsp; Log in</a></li>
-            {% endif %} -->
-            <li><a href="/Contact Us/"><!--<span class="glyphicon glyphicon-user"></span>--> &nbsp; Contact Us</a></li>
+            <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span> &nbsp; Log in</a></li>
+            {% endif %} 
+            <li><a href="/Contact Us"><span class="glyphicon glyphicon-user"></span> &nbsp; Contact Us</a></li>
           </ul>
         </div>
       </div>
     </nav>
   </header>
-  <br/>
-  <br>
-  <br>
-  <div class="row">
-    {% block start %}
-    <!-- {% if user.is_authenticated %}
-    <center><h1>welcome, here</h1></center>
-    <br />
-    &nbsp;
-    &nbsp;
-    <a href="/consolidated_data1/">
-      <button type="submit" style="font-size: 2rem; padding:1%;" class="btn btn-raised btn-info waves-effect waves-light">Consolidated <br /> Report<div class="ripple-container"></div></button>
-    </a>
-    &nbsp;
-    <a href="/Alert1/">
-      <button type="submit" class="btn btn-raised btn-info waves-effect waves-light">Alert2<div class="ripple-container"></div></button>
-    </a>
+  <br />
+  <br />
+  <br />
+  {% block start %}
+    
+    {% if user.is_authenticated %}
+    
+    <div class="row" >
+      <div class="column">
+        <div class="card">
+          <a href="/Driver">
+            <img src="{% static  'images/driver1.png' %}" alt="Driver" style="width:100%; height: 350px">
+            <div class="content" style="padding: 1px; text-align: center;">
+              <h4><b> Driver Details</b></h4> 
+            </div>
+          </a>
+        </div>
+      </div>
+      
+      <div class="column">
+        <div class="card">
+          <a href="/Vehicle">
+            <img src="{% static  'images/vehicle1.png' %}" alt="Vehicle" style="width: 100%; height: 350px;">
+            <div class="content valign-wrapper" style="padding: 1px; text-align: center;">
+              <h4><b> Vehicle Details</b></h4> 
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="column">
+        <div class="card">
+          <a href="/Vehicle">
+            <img src="{% static  'images/vehicle1.png' %}" alt="Vehicle" style="width: 100%; height: 350px;">
+            <div class="content valign-wrapper" style="padding: 1px; text-align: center;">
+              <h4><b> Trip Details</b></h4> 
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="column">
+        <div class="card">
+          <a href="/Vehicle">
+            <img src="{% static  'images/vehicle1.png' %}" alt="Vehicle" style="width: 100%; height: 350px;">
+            <div class="content valign-wrapper" style="padding: 1px; text-align: center;">
+              <h4><b> Bank Details</b></h4> 
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+   
     {% else %}
-    <center><h1>log in, plz . . .</h1></center>
-    {% endif %} -->
+      <center><h1>log in, plz . . .</h1></center>
+    {% endif %}
+    
     {% endblock %}
-  </div>
+  
 </body>
 
 </html>

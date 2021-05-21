@@ -1,0 +1,6 @@
+django
+django-crispy-forms
+pandas
+xlrd
+tqdm
+# django_pdb

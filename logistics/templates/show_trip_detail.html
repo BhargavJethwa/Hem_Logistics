@@ -1,0 +1,45 @@
+{% extends "index.html" %}
+{% load crispy_forms_tags %}
+{% block start %}
+
+<table class="table table-striped table-bordered table-sm" style="overflow-y: scroll; height: 1px;">  
+    <thead class="thead-dark">  
+    <tr>  
+        <th>RC Number</th>  
+        <th>Driver's Name</th>  
+        <th>Trip ID</th>  
+        <th>Source</th>
+        <th>Total Payment</th>
+        <th>Advance Payment</th>
+        {% if user.is_authenticated %} 
+        <th>Actions</th>  
+        {% endif %}
+    </tr>  
+    </thead>  
+    <tbody>  
+{% for x in trip_detail %}  
+    <tr>  
+        <td>{{ x.Vehicle }}</td>  
+        <td>{{ x.Driver }}</td>  
+        <td>{{ x.Trip_id }}</td>  
+        <td>{{ x.Source }}</td>
+        <td>{{ x.Total_payment }}</td>
+        <td>{{ x.Advance_payment }}</td>
+        {% if user.is_authenticated %}
+        <td>  
+            <a href="/edit_trip_detail/{{ x.id }}"><span class="glyphicon glyphicon-pencil" >Edit</span></a>  
+            <a href="/delete_trip_detail/{{ x.id }}"><span class="glyphicon glyphicon-remove" style="margin-left: 10px;" >Delete</span></a>  
+        </td> 
+        {% endif %} 
+    </tr>  
+{% endfor %}  
+    </tbody>  
+</table>  
+<br>  
+<br>  
+{% if user.is_authenticated %}
+<center><a href="/Add Trip Detail/" class="btn btn-primary">Add New Record</a></center>
+{% endif %} 
+
+
+{% endblock start %}

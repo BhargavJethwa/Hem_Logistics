@@ -79,7 +79,7 @@
   {% for message in messages %}
 
   <script>
-    M.toast({html: "{{ message }}"})
+    // M.toast({html: "{{ message }}"})
     alert("{{ message }}");
   </script>
 
@@ -134,7 +134,7 @@
   <br />
   {% block start %}
     
-    {% if user.is_authenticated %}
+    
     
     <div class="row" >
       <div class="column">
@@ -142,7 +142,7 @@
           <a href="/Driver">
             <img src="{% static  'images/driver1.png' %}" alt="Driver" style="width:100%; height: 350px">
             <div class="content" style="padding: 1px; text-align: center;">
-              <h4><b> Driver Details</b></h4> 
+              <h4><b> Driver Detail</b></h4> 
             </div>
           </a>
         </div>
@@ -153,7 +153,7 @@
           <a href="/Vehicle">
             <img src="{% static  'images/vehicle1.png' %}" alt="Vehicle" style="width: 100%; height: 350px;">
             <div class="content valign-wrapper" style="padding: 1px; text-align: center;">
-              <h4><b> Vehicle Details</b></h4> 
+              <h4><b> Vehicle Detail</b></h4> 
             </div>
           </a>
         </div>
@@ -161,31 +161,28 @@
 
       <div class="column">
         <div class="card">
-          <a href="/Vehicle">
+          <a href="/Trip Detail">
             <img src="{% static  'images/vehicle1.png' %}" alt="Vehicle" style="width: 100%; height: 350px;">
             <div class="content valign-wrapper" style="padding: 1px; text-align: center;">
-              <h4><b> Trip Details</b></h4> 
+              <h4><b> Trip Detail</b></h4> 
             </div>
           </a>
         </div>
       </div>
-
+      {% if user.is_authenticated %}
       <div class="column">
         <div class="card">
-          <a href="/Vehicle">
+          <a href="/Bank Detail">
             <img src="{% static  'images/vehicle1.png' %}" alt="Vehicle" style="width: 100%; height: 350px;">
             <div class="content valign-wrapper" style="padding: 1px; text-align: center;">
-              <h4><b> Bank Details</b></h4> 
+              <h4><b> Bank Detail</b></h4> 
             </div>
           </a>
         </div>
       </div>
+      {% endif %}
     </div>
    
-    {% else %}
-      <center><h1>log in, plz . . .</h1></center>
-    {% endif %}
-    
     {% endblock %}
   
 </body>

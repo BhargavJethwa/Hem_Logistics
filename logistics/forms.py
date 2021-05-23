@@ -10,7 +10,9 @@ class Trip_detailForm(forms.ModelForm):
     # specify the name of model to use
     class Meta:
         model = Trip_detail
-        fields = "__all__"
+        # fields = "__all__"
+        exclude = ['Date']
+
 
 class VehicleForm(forms.ModelForm):
     # specify the name of model to use

@@ -8,28 +8,35 @@
         <th>Driver's Name</th>  
         <th>License Number</th>  
         <th>License Expiry</th>  
-        <th>Contact Number</th>  
+        <th>Contact Number</th> 
+        {% if user.is_authenticated %} 
         <th>Actions</th>  
+        {% endif %}
     </tr>  
     </thead>  
     <tbody>  
-{% for x in drivers %}  
+{% for x in driver %}  
     <tr>  
         <td>{{ x.Name }}</td>  
         <td>{{ x.License_number }}</td>  
         <td>{{ x.License_expiry }}</td>  
         <td>{{ x.Contact_number }}</td>  
+        {% if user.is_authenticated %}
         <td>  
             <a href="/edit_driver/{{ x.id }}"><span class="glyphicon glyphicon-pencil" >Edit</span></a>  
-            <a href="/delete_driver/{{ x.id }}">Delete</a>  
-        </td>  
+            
+            <a href="/delete_driver/{{ x.id }}"><span class="glyphicon glyphicon-remove" style="margin-left: 10px;" >Delete</span></a>  
+        </td> 
+        {% endif %} 
     </tr>  
 {% endfor %}  
     </tbody>  
 </table>  
 <br>  
 <br>  
-<center><a href="/Add Driver" class="btn btn-primary">Add New Record</a></center>
+{% if user.is_authenticated %}
+<center><a href="/Add Driver/" class="btn btn-primary">Add New Record</a></center>
+{% endif %} 
 
 
 {% endblock start %}

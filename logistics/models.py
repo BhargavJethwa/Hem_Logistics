@@ -32,7 +32,7 @@ TYPE_CHOICES = (
 class Vehicle(models.Model):
     Owner  = models.CharField(max_length=14, verbose_name="Owner's Name")
     ##format GJ11BCXXXX
-    RC_number = models.CharField(verbose_name="RC Number",max_length=13, validators=[MinLengthValidator(12,message = "Invalid RC Number")])
+    RC_number = models.CharField(unique =True, verbose_name="RC Number", max_length=13, validators=[MinLengthValidator(12,message = "Invalid RC Number")])
     PAN_number = models.CharField(verbose_name="PAN Number", max_length=10, validators=[MinLengthValidator(10,message = "Invalid PAN Number")])
     
     Type = models.CharField(verbose_name="Type of Vehicle", choices=TYPE_CHOICES, default='PICKUP',max_length=10)
@@ -50,9 +50,9 @@ class Vehicle(models.Model):
 class Trip_detail(models.Model):
     Vehicle = models.ForeignKey(
         'Vehicle',
-         on_delete=models.RESTRICT,
-         verbose_name="RC Number",
-         )
+        on_delete=models.RESTRICT,
+        verbose_name="RC Number",
+    )
     Driver = models.ForeignKey(
         'Driver',
         verbose_name="Driver's Name",
@@ -63,6 +63,7 @@ class Trip_detail(models.Model):
     # Destination (can be multiple)
     Total_payment = models.IntegerField(validators=[MinValueValidator(0)])
     Advance_payment = models.IntegerField(validators=[MinValueValidator(0)])
+    Date=models.DateField(default=now)
 
     def __str__(self):
         return self.Trip_id

@@ -20,8 +20,10 @@ class VehicleForm(forms.ModelForm):
         model = Vehicle
         fields = "__all__"
         widgets = {
-            'RC_number': widgets.TextInput(attrs={'placeholder':'GJ-XX-AB-XXXX', 'rows': 2}),
-            'Insurance_expiry_date': widgets.DateInput( format='%d-%m-%y', attrs={'type':'date', 'placeholder':'DD-MM-YYYY'})
+            'RC_number': widgets.TextInput(attrs={'placeholder':'GJ-XX-AB-XXXX',}),
+            'Contact_number': widgets.TextInput(attrs={'placeholder':'1234567890',}),
+            'Insurance_expiry_date': widgets.DateInput( format='%d-%m-%y', attrs={'type':'date', 'placeholder':'DD-MM-YYYY'}),
+            'PUC_expiry_date': widgets.DateInput( format='%d-%m-%y', attrs={'type':'date', 'placeholder':'DD-MM-YYYY'}),
         }
 
 class DriverForm(forms.ModelForm):

@@ -20,11 +20,13 @@ from logistics import views as logistics_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
     path('', logistics_view.index, name='index'),
-    path('Home/', logistics_view.home, name='home'), 
-    path('Contact Us', logistics_view.contact_us,name='contact_us'), 
+    path('Home/', logistics_view.home, name='home'),
+    path('Notifications/', logistics_view.notifications, name ='notifications'), 
     path('login/', logistics_view.Login, name ='login'), 
     path('logout/', auth.LogoutView.as_view(next_page='home'), name ='logout'),
+    path('Contact Us', logistics_view.contact_us,name='contact_us'), 
     
     path('Add Driver/', logistics_view.driver, name='driver'),
     path('Driver/', logistics_view.show_driver, name='show_driver'),
@@ -37,7 +39,8 @@ urlpatterns = [
     path('update_trip_detail/<int:id>', logistics_view.update_trip_detail, name='update_trip_detail'),
     path('edit_trip_detail/<int:id>', logistics_view.edit_trip_detail, name='edit_trip_detail'),
     path('delete_trip_detail/<int:id>', logistics_view.delete_trip_detail, name='delete_trip_detail'), 
-   
+    path('favoriteAjax/', logistics_view.favorite_ajax, name='favoriteAjax'),
+
     path('Add Vehicle/', logistics_view.vehicle, name='vehicle'), 
     path('Vehicle/', logistics_view.show_vehicle, name='show_vehicle'),
     path('update_vehicle/<int:id>', logistics_view.update_vehicle, name='update_vehicle'),

@@ -2,16 +2,36 @@
 {% load crispy_forms_tags %}
 {% block start %}
 
-<table class="table table-striped table-bordered table-sm" style="overflow-y: scroll; height: 1px;">  
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
+  
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
+<script>
+  $(document).ready( function () {
+    $('#table').DataTable();
+  } );
+</script>
+
+<!-- <div class= "modal_container" id="vehicle_modal_container">
+    <div class="modalll">
+      <button id=close><span class="glyphicon glyphicon-log-out"></span></button>
+      <br />
+      <h1>This is body</h1>
+    </div>
+</div>   -->
+
+<h1 style="text-align: center; padding-top: 20px;"> Vehicle details</h1>
+</br>
+<table id = "table" class="table table-striped">  
     <thead class="thead-dark">  
     <tr>   
-        <th>Owner</th>  
+        <th >Owner</th>  
         <th>RC Number</th>
         <th>PAN Number</th>
         <th>Type</th>
         <th>Other</th>
         <th>Insurance Policy Number</th>
         <th>Insurance Expiry Date</th>
+        <th>PUC Expiry Date</th>
         <th>Safety Equipments</th>
         <th>GPS</th>
         <th>Contact Number</th> 
@@ -24,12 +44,13 @@
 {% for x in vehicle %}  
     <tr>  
         <td>{{ x.Owner }}</td>  
-        <td>{{ x.RC_number }}</td>  
+        <td id="{{ x.id }}">{{ x.RC_number }}</td>  
         <td>{{ x.PAN_number }}</td>  
         <td>{{ x.Type }}</td>
         <td>{{ x.Other }}</td>  
         <td>{{ x.Insurance_policy_number }}</td>  
         <td>{{ x.Insurance_expiry_date }}</td>
+        <td>{{ x.PUC_expiry_date }}</td>
         <td>{{ x.Safety_equipments }}</td>  
         <td>{{ x.GPS }}</td>  
         <td>{{ x.Contact_number }}</td>  
@@ -44,11 +65,27 @@
 {% endfor %}  
     </tbody>  
 </table>  
-<br>  
-<br>  
-{% if user.is_authenticated %}
-<center><a href="/Add Vehicle/" class="btn btn-primary">Add New Record</a></center>
-{% endif %} 
 
+{% if user.is_authenticated %}
+    <center><a href="/Add Vehicle/" style="padding: 5px;" class="btn btn-primary">Add New Record</a></center>
+{% endif %} 
+</br>
+</br>
+
+<!-- {% for x in vehicle %}
+    <script>
+        document.getElementById('{{x.id}}').addEventListener('click',()=>{
+            document.getElementById('vehicle_modal_container').classList.add('show');
+            console.log("{{x.RC_number}}");
+            $('#table').parents('div.dataTables_wrapper').first().hide();
+        });
+    </script>
+{% endfor %}
+<script>
+    document.getElementById('close').addEventListener('click',()=>{
+        document.getElementById('modal_container').classList.remove('show');
+        $('#table').parents('div.dataTables_wrapper').first().show();
+    });
+</script> -->
 
 {% endblock start %}

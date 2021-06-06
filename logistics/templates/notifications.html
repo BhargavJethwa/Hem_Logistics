@@ -1,0 +1,111 @@
+{% extends "index.html" %}
+{% load crispy_forms_tags %}
+{% block start %}
+
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
+  
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
+<script>
+  $(document).ready( function () {
+    // $('#puc_table').DataTable();
+    // $('#insurance_table').DataTable();
+    // $('#license_table').DataTable();
+  } );
+</script>
+
+<h1 style="text-align: center; padding-top: 20px;"> PUC expired</h1>
+</br>
+<table id = "insurance_table" class="table table-striped">  
+    <thead class="thead-dark">  
+    <tr>   
+        <th >Owner</th>  
+        <th>RC Number</th>
+        <th>PUC Expiry Date</th>
+        <th>Contact Number</th> 
+        {% if user.is_authenticated %} 
+        <th>Actions</th>  
+        {% endif %}
+    </tr>  
+    </thead>  
+    <tbody>  
+{% for x in PUC %}  
+    <tr>  
+        <td>{{ x.Owner }}</td>  
+        <td id="{{ x.id }}">{{ x.RC_number }}</td>  
+        <td>{{ x.PUC_expiry_date }}</td>
+        <td>{{ x.Contact_number }}</td>  
+        {% if user.is_authenticated %}
+        <td>  
+            <a href="/edit_vehicle/{{ x.id }}"><span class="glyphicon glyphicon-pencil" >Edit</span></a>  
+        </td> 
+        {% endif %} 
+    </tr>  
+{% endfor %}  
+    </tbody>  
+</table>  
+
+<h1 style="text-align: center; padding-top: 20px;"> Insurance expired</h1>
+</br>
+<table id = "puc_table" class="table table-striped">  
+    <thead class="thead-dark">  
+    <tr>   
+        <th >Owner</th>  
+        <th>RC Number</th>
+        <th>Insurance Policy Number</th>
+        <th>Insurance Expiry Date</th>
+        <th>Contact Number</th> 
+        {% if user.is_authenticated %} 
+        <th>Actions</th>  
+        {% endif %}
+    </tr>  
+    </thead>  
+    <tbody>  
+{% for x in insurance %}  
+    <tr>  
+        <td>{{ x.Owner }}</td>  
+        <td id="{{ x.id }}">{{ x.RC_number }}</td>  
+        <td>{{ x.Insurance_policy_number }}</td>  
+        <td>{{ x.Insurance_expiry_date }}</td>
+        <td>{{ x.Contact_number }}</td>  
+        {% if user.is_authenticated %}
+        <td>  
+            <a href="/edit_vehicle/{{ x.id }}"><span class="glyphicon glyphicon-pencil" >Edit</span></a>  
+        </td> 
+        {% endif %} 
+    </tr>  
+{% endfor %}  
+    </tbody>  
+</table>  
+<h1 style="text-align: center; padding-top: 20px;"> License expired</h1>
+</br>
+<table id="license_table" class="table table-striped" style="overflow-y: scroll; height: 1px;">  
+    <thead class="thead-dark">  
+    <tr>  
+        <th>Driver's Name</th>  
+        <th>License Number</th>  
+        <th>License Expiry</th>  
+        <th>Contact Number</th> 
+        {% if user.is_authenticated %} 
+        <th>Actions</th>  
+        {% endif %}
+    </tr>  
+    </thead>  
+    <tbody>  
+{% for x in license %}  
+    <tr>  
+        <td>{{ x.Name }}</td>  
+        <td>{{ x.License_number }}</td>  
+        <td>{{ x.License_expiry }}</td>  
+        <td>{{ x.Contact_number }}</td>  
+        {% if user.is_authenticated %}
+        <td>  
+            <a href="/edit_driver/{{ x.id }}"><span class="glyphicon glyphicon-pencil" >Edit</span></a>  
+        </td> 
+        {% endif %} 
+    </tr>  
+{% endfor %}  
+    </tbody>  
+</table>  
+
+
+{% endblock start %}

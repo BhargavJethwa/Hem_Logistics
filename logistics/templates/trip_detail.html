@@ -2,7 +2,42 @@
 {% load crispy_forms_tags %}
 {% block start %}
 
-
+<script>
+    $(document).ready(function (){
+        $("#id_Driver").change(function() {
+            if($(this).val() != ""){
+                $('#id_Vehicle').show();
+                $('#id_Vehicle').attr('required', '');
+                $('#id_Vehicle').attr('data-error', 'This field is required.');
+                $("label[for='id_Vehicle']").text("RC Number");
+                $('#id_Vehicle').empty();
+                $driver_id = $(this).val();
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'favoriteAjax' %}",
+                    data: { action: "get_vehicles",
+                            id: $driver_id,
+                            csrfmiddlewaretoken: '{{ csrf_token }}' },
+                    dataType: 'json',
+                    success: function(response){
+                        $("#id_Vehicle").append("<option value selected> --------- </option>");
+                        $.each(response,function(i, v) {
+                            $("#id_Vehicle").append("<option value="+ v.pk +" > "+ v.fields.RC_number + " </option>");
+                        });
+                    }
+                });
+            }
+            else{
+                $("label[for='id_Vehicle']").empty();
+                $('#id_Vehicle').hide();
+            }
+        });
+        $("#id_Driver").trigger("change");
+        $("#id_Total_payment").keyup(function(){
+            $("#id_Advance_payment").attr({"max":$("#id_Total_payment").val()});
+        });
+    });
+</script>
 
 <div class="container">
     <div class="row">

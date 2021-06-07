@@ -11,13 +11,7 @@
   } );
 </script>
 
-<!-- <div class= "modal_container" id="vehicle_modal_container">
-    <div class="modalll">
-      <button id=close><span class="glyphicon glyphicon-log-out"></span></button>
-      <br />
-      <h1>This is body</h1>
-    </div>
-</div>   -->
+
 
 <h1 style="text-align: center; padding-top: 20px;"> Vehicle details</h1>
 </br>
@@ -28,7 +22,7 @@
         <th>RC Number</th>
         <th>PAN Number</th>
         <th>Type</th>
-        <th>Other</th>
+        <!-- <th>Other</th> -->
         <th>Insurance Policy Number</th>
         <th>Insurance Expiry Date</th>
         <th>PUC Expiry Date</th>
@@ -44,10 +38,10 @@
 {% for x in vehicle %}  
     <tr>  
         <td>{{ x.Owner }}</td>  
-        <td id="{{ x.id }}">{{ x.RC_number }}</td>  
+        <td>{{ x.RC_number }}</td>  
         <td>{{ x.PAN_number }}</td>  
-        <td>{{ x.Type }}</td>
-        <td>{{ x.Other }}</td>  
+        <td id="{{ x.id }}">{{ x.Type }}</td>
+        <!-- <td>{{ x.Other }}</td>     -->
         <td>{{ x.Insurance_policy_number }}</td>  
         <td>{{ x.Insurance_expiry_date }}</td>
         <td>{{ x.PUC_expiry_date }}</td>
@@ -64,7 +58,7 @@
     </tr>  
 {% endfor %}  
     </tbody>  
-</table>  
+</table>    
 
 {% if user.is_authenticated %}
     <center><a href="/Add Vehicle/" style="padding: 5px;" class="btn btn-primary">Add New Record</a></center>
@@ -72,20 +66,11 @@
 </br>
 </br>
 
-<!-- {% for x in vehicle %}
+{% for v in vehicle %}
     <script>
-        document.getElementById('{{x.id}}').addEventListener('click',()=>{
-            document.getElementById('vehicle_modal_container').classList.add('show');
-            console.log("{{x.RC_number}}");
-            $('#table').parents('div.dataTables_wrapper').first().hide();
-        });
+        if("{{v.Type}}"=="OTHER"){
+            $('#{{v.id}}').html("{{v.Other}}");
+        }
     </script>
 {% endfor %}
-<script>
-    document.getElementById('close').addEventListener('click',()=>{
-        document.getElementById('modal_container').classList.remove('show');
-        $('#table').parents('div.dataTables_wrapper').first().show();
-    });
-</script> -->
-
 {% endblock start %}

@@ -37,7 +37,9 @@
         <td>
             <ul>
             {% for v in x.Vehicle.all %}
-                <li>{{ v }}</li>
+                <li>
+                    <button class="astext" id = {{x.id}}{{v.id}}>{{ v }}</button>
+                </li>
             {% endfor %}
             </ul>
         </td>  
@@ -57,8 +59,63 @@
 <center><a href="/Add Driver/" class="btn btn-primary">Add New Record</a></center>
 {% endif %} 
 
-<br>  
-<br>  
+<div class= "modal_container" id="vehicle_modal_container">
+    <div class="modalll" style="top:15%;">
+      <div>
+        <p id=Owner></p>
+        <p id=RC_number></p>
+        <p id=PAN_number></p>
+        <p id=Type></p>
+        <p id=Other></p>
+        <p id=Insurance_policy_number></p>
+        <p id=Insurance_expiry_date></p>
+        <p id=PUC_expiry_date></p>
+        <p id=Safety_equipments></p>
+        <p id=GPS></p>
+        <p id=Contact_number></p>
+        <hr style="height:2px;border-width:0;color:gray;background-color:gray">
+        <center>
+            <button id=close style="padding: 5px;" class="btn btn-primary">Close me</button>
+        </center>
+      </div>
 
+    </div>
+</div>
+
+<br />  
+<br />  
+{% for v in driver %}
+    {% for x in v.Vehicle.all %}
+        <script>
+            document.getElementById('{{v.id}}{{x.id}}').addEventListener('click',()=>{
+                document.getElementById('vehicle_modal_container').classList.add('show');
+                console.log("{{x.RC_number}}");
+                // $('#table').parents('div.dataTables_wrapper').first().hide();
+                $('#Owner').html("Owner: {{ x.Owner }}");
+                $('#RC_number').html("RC Number:  {{ x.RC_number }}");
+                $('#PAN_number').html("PAN number:  {{ x.PAN_number }}");
+                if("{{x.Type}}" != "OTHER"){
+                    $('#Type').html("Vehicle Type:  {{ x.Type }}");
+                }
+                else{
+                    $('#Other').html("Vehicle Type:  {{ x.Other }}");
+                }
+                $('#Insurance_policy_number').html("Insurance policy number:  {{ x.Insurance_policy_number }}");
+                $('#Insurance_expiry_date').html("Insurance expiry date:  {{ x.Insurance_expiry_date }}");
+                $('#PUC_expiry_date').html("PUC expiry date:  {{ x.PUC_expiry_date }}");
+                $('#Safety_equipments').html("Safety equipments:  {{ x.Safety_equipments }}");
+                $('#GPS').html("GPS:  {{ x.GPS }}");
+                $('#Contact_number').html("Contact number:  {{ x.Contact_number }}");
+
+            });
+        </script>
+    {% endfor %}
+{% endfor %}
+<script>
+    document.getElementById('close').addEventListener('click',()=>{
+        document.getElementById('vehicle_modal_container').classList.remove('show');
+        // $('#table').parents('div.dataTables_wrapper').first().show();
+    });
+</script>
 
 {% endblock start %}

@@ -4,10 +4,12 @@ from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from .models import Bank_detail, Driver,Vehicle,Trip_detail
-from .helper_functions import check_expiry
+from .helper_functions import check_expiry_insurance,check_expiry_license,check_expiry_PUC
 from django.http import HttpResponse, JsonResponse
 from django.core import serializers
 import json
+from pprint import pprint
+import simplejson as sjson
 
 # Create your views here.
 
@@ -89,7 +91,41 @@ def trip_detail(request):
 	if request.method=='POST':
 		form = Trip_detailForm(request.POST)
 		if form.is_valid():
-			form.save()
+			# pprint(request.POST)
+			# form.save()
+			trip=Trip_detail()
+			trip.Driver=Driver.objects.get(id=request.POST.get('Driver'))
+			trip.Vehicle=Vehicle.objects.get(id=request.POST.get('Vehicle'))
+			trip.Bank_detail=Bank_detail.objects.get(id=request.POST.get('Bank_detail'))
+			trip.Trip_id=request.POST.get('Trip_id')
+			trip.Rate_type=request.POST.get('Rate_type')
+			trip.Distance=request.POST.get('Distance')
+			if request.POST.get('Rate') is not '':
+				trip.Rate=request.POST.get('Rate')
+			else:
+				trip.Rate=0
+			trip.Freight=request.POST.get('Freight')
+			trip.Other_charges=request.POST.get('Other_charges')
+			trip.Advance_payment=request.POST.get('Advance_payment')
+			trip.Source=request.POST.get('Source')
+			i=1
+			Destination=[]
+			loading_charges=[]
+			unloading_charges=[]
+			loading_charges.append(request.POST.get('source_loading'))
+			total_payment=int(trip.Freight)+int(trip.Other_charges)+int(loading_charges[0])
+			while(request.POST.get('destination_'+str(i)) is not None):
+				Destination.append(request.POST.get('destination_'+str(i)))
+				loading_charges.append(request.POST.get('destination_'+str(i)+'_loading'))
+				unloading_charges.append(request.POST.get('destination_'+str(i)+'_unloading'))
+				total_payment = total_payment+int(loading_charges[i])+int(unloading_charges[i-1])
+				i=i+1
+			trip.Destination=json.dumps(Destination)
+			trip.Load_charges=json.dumps(loading_charges)
+			trip.Unload_charges=json.dumps(unloading_charges)
+			trip.Total_payment = total_payment
+			
+			trip.save()			
 			messages.success(request, 'Added successfully!!!')
 			form = Trip_detailForm()
 			return redirect("/Trip Detail")
@@ -99,26 +135,31 @@ def trip_detail(request):
 #################### Ajax for trip detail ####################################### 
 
 def favorite_ajax(request):
-	response_dict= {
-			'success': False,
-	}
+
 	if request.method=='POST':
-		id=request.POST['id']
-		driver = Driver.objects.get(id=id)
-		data=[]
-		print(type(driver))
-		print(type(driver.Vehicle.all()))
-		for x in driver.Vehicle.all():
-			data.append(x)
-		
-		data1 = serializers.serialize('json',driver.Vehicle.all())
-		obj = json.loads(data1)
-		# response_dict['success']= True
-		# json.dumps(response_dict, default=lambda o: o.__dict__, 
-        #     sort_keys=True, indent=4)
-		# response_dict['car']=data1
-	# return HttpResponse((response_dict))#, mimetype='application/json')
-	return JsonResponse(obj,status=200,safe=False)
+		driver_id=request.POST['driver_id']
+		vehicle_id=request.POST['vehicle_id']
+		if driver_id:
+			driver = Driver.objects.get(id=driver_id)
+			data=[]
+			# print(type(driver))
+			# print(type(driver.Vehicle.all()))
+			for x in driver.Vehicle.all():
+				data.append(x)
+			
+			data1 = serializers.serialize('json',driver.Vehicle.all())
+			obj = json.loads(data1)
+
+		if vehicle_id:
+			vehicle=Vehicle.objects.get(id=vehicle_id)
+			Banks = Bank_detail.objects.filter(Vehicle=vehicle)
+			# print(type(Banks))
+
+			
+			data1 = serializers.serialize('json',Banks)
+			obj = json.loads(data1)
+
+		return JsonResponse(obj,status=200,safe=False)
 
 #################### Vehicle ####################################### 
 
@@ -211,9 +252,17 @@ def Login(request):
 
 ################ Notifications ################################################### 
 
-def notifications(request):
-	check_expiry()
-	insurance = Vehicle.objects.filter(Insurance_expired=True)
+def PUC_notifications(request):
+	check_expiry_PUC()
 	PUC = Vehicle.objects.filter(PUC_expired=True)
+	return render(request,'PUC_notifications.html',{'title':'Notifications', 'PUC':PUC})
+
+def license_notifications(request):
+	check_expiry_license()
 	license = Driver.objects.filter(License_expired=True)
-	return render(request,'notifications.html',{'title':'Notifications', 'PUC':PUC,'insurance':insurance,'license':license})
+	return render(request,'license_notifications.html',{'title':'Notifications', 'license':license})
+
+def insurance_notifications(request):
+	check_expiry_insurance()
+	insurance = Vehicle.objects.filter(Insurance_expired=True)
+	return render(request,'insurance_notifications.html',{'title':'Notifications', 'insurance':insurance})

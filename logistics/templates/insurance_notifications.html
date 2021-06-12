@@ -1,0 +1,47 @@
+{% extends "index.html" %}
+{% load crispy_forms_tags %}
+{% block start %}
+
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
+  
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
+<script>
+  $(document).ready( function () {
+    $('#insurance_table').DataTable();
+  } );
+</script>
+
+<h1 style="text-align: center; padding-top: 20px;"> Insurance alert</h1>
+</br>
+<table id = "insurance_table" class="table table-striped">  
+    <thead class="thead-dark">  
+    <tr>   
+        <th >Owner</th>  
+        <th>RC Number</th>
+        <th>Insurance Policy Number</th>
+        <th>Insurance Expiry Date</th>
+        <th>Contact Number</th> 
+        {% if user.is_authenticated %} 
+        <th>Actions</th>  
+        {% endif %}
+    </tr>  
+    </thead>  
+    <tbody>  
+{% for x in insurance %}  
+    <tr>  
+        <td>{{ x.Owner }}</td>  
+        <td id="{{ x.id }}">{{ x.RC_number }}</td>  
+        <td>{{ x.Insurance_policy_number }}</td>  
+        <td>{{ x.Insurance_expiry_date }}</td>
+        <td>{{ x.Contact_number }}</td>  
+        {% if user.is_authenticated %}
+        <td>  
+            <a href="/edit_vehicle/{{ x.id }}"><span class="glyphicon glyphicon-pencil" >Edit</span></a>  
+        </td> 
+        {% endif %} 
+    </tr>  
+{% endfor %}  
+    </tbody>  
+</table>  
+
+{% endblock start %}

@@ -12,7 +12,7 @@ class Trip_detailForm(forms.ModelForm):
     class Meta:
         model = Trip_detail
         # fields = "__all__"
-        exclude = ['Date_created']
+        exclude = ['Date_created','unload_charges','load_charges','destination','Total_payment','Destination','Load_charges','Unload_charges']
 
 
 class VehicleForm(forms.ModelForm):

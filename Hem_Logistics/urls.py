@@ -23,7 +23,6 @@ urlpatterns = [
 
     path('', logistics_view.index, name='index'),
     path('Home/', logistics_view.home, name='home'),
-    path('Notifications/', logistics_view.notifications, name ='notifications'), 
     path('login/', logistics_view.Login, name ='login'), 
     path('logout/', auth.LogoutView.as_view(next_page='home'), name ='logout'),
     path('Contact Us', logistics_view.contact_us,name='contact_us'), 
@@ -52,4 +51,9 @@ urlpatterns = [
     path('update_bank_detail/<int:id>', logistics_view.update_bank_detail, name='update_bank_detail'),
     path('edit_bank_detail/<int:id>', logistics_view.edit_bank_detail, name='edit_bank_detail'),
     path('delete_bank_detail/<int:id>', logistics_view.delete_bank_detail, name='delete_bank_detail'),
+
+    path('PUC_Notifications/', logistics_view.PUC_notifications, name ='PUC_Notifications'), 
+    path('License_Notifications/', logistics_view.license_notifications, name ='License_Notifications'), 
+    path('Insurance_Notifications/', logistics_view.insurance_notifications, name ='Insurance_Notifications'), 
+
 ]

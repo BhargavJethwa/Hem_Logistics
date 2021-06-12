@@ -25,7 +25,7 @@ class Vehicle(models.Model):
     RC_number = models.CharField(unique =True, verbose_name="RC Number", max_length=13, validators=[MinLengthValidator(12,message = "Invalid RC Number"), RegexValidator('([A-Z]{2})+-([0-9]{1})+-[A-Z]+-[0-9]{4}',message = "Use proper formatting")])
     PAN_number = models.CharField(verbose_name="PAN Number", max_length=10, validators=[MinLengthValidator(10,message = "Invalid PAN Number")])
     
-    Type = models.CharField(verbose_name="Type of Vehicle", choices=TYPE_CHOICES, default='PICKUP',max_length=10)
+    Type = models.CharField(verbose_name="Type of Vehicle", choices=TYPE_CHOICES, max_length=10)
     Other = models.CharField(blank = True,verbose_name='',max_length=10)
     Insurance_policy_number = models.CharField(max_length=25)
     PUC_expiry_date = models.DateField()
@@ -41,6 +41,7 @@ class Vehicle(models.Model):
     def save(self, *args, **kwargs):
         if(self.Other):
             self.Other = self.Other.upper()
+        self.Owner = self.Owner.upper()
         super(Vehicle, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -53,6 +54,10 @@ class Driver(models.Model):
     Contact_number = models.CharField(verbose_name="Contact Number", max_length=10,validators=[RegexValidator('[0-9]{10}',message = "Invalid Number")])
     Vehicle=models.ManyToManyField(Vehicle)
     License_expired = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        self.Name = self.Name.upper()
+        super(Driver, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.Name
@@ -68,12 +73,24 @@ class Trip_detail(models.Model):
         on_delete=models.RESTRICT,
         verbose_name="RC Number",
     )
-    Trip_id = models.CharField(max_length=14)
-    Source = models.CharField(max_length=14)
-    # Destination (can be multiple)
+    Bank_detail = models.ForeignKey(
+        'Bank_detail',
+        on_delete=models.RESTRICT,
+        verbose_name="Bank Details",
+    )
+    Trip_id = models.CharField(max_length=50)
     Total_payment = models.IntegerField(validators=[MinValueValidator(0)])
+    Rate_type = models.CharField(verbose_name="Rate Type", choices=(('FIX','FIX'),('VARIABLE','VARIABLE'),),max_length=8)
+    Distance = models.IntegerField(verbose_name="Distance (Kms)",validators=[MinValueValidator(0)])
+    Rate = models.IntegerField(validators=[MinValueValidator(0)], blank=True)
+    Freight = models.IntegerField(validators=[MinValueValidator(0)])
+    Other_charges = models.IntegerField(verbose_name="Other Charges", validators=[MinValueValidator(0)])
     Advance_payment = models.IntegerField(validators=[MinValueValidator(0)])
     Date_created=models.DateField(auto_now_add=True)
+    Source = models.CharField(max_length=50)
+    Destination = models.TextField()
+    Load_charges = models.TextField()
+    Unload_charges = models.TextField()
 
     def __str__(self):
         return self.Trip_id
@@ -85,9 +102,9 @@ class Bank_detail(models.Model):
         verbose_name="RC Number",
     )
     Account_number = models.CharField(verbose_name="Account Number",max_length=20)
-    Account_holder = models.CharField(verbose_name="Account Holder",max_length=20)
+    Account_holder = models.CharField(verbose_name="Account Holder",max_length=50)
     IFSC = models.CharField(verbose_name="IFSC Code",max_length=20)
-    Account_type =models.CharField(verbose_name="Account Type", choices=(('SAVINGS','SAVINGS'),('CURRENT','CURRENT'),), default='CURRENT',max_length=7)
+    Account_type = models.CharField(verbose_name="Account Type", choices=(('SAVINGS','SAVINGS'),('CURRENT','CURRENT'),),max_length=7)
     
     def __str__(self):
         return self.Account_number

@@ -49,24 +49,22 @@
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container-fluid">
         <div class="navbar-header">
-          <!-- <button class="navbar-toggle" data-toggle="collapse" data-target="#mainNavBar">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button> -->
-          <!-- {% if user.is_authenticated %} -->
           <a class="navbar-brand" class="styleheader" href="/Home"><span class="glyphicon glyphicon-stats"></span> &nbsp; Hem Logistics</a>
-          <!-- {% else %} -->
-          <!-- <a class="navbar-brand" class="styleheader" href="/Home"><span class="glyphicon glyphicon-stats"></span> &nbsp; Hem Logistics</a> -->
-          <!-- {% endif %} -->
-
         </div>
         <div class="collapse navbar-collapse" id="mainNavBar">
           <ul class="nav navbar-nav navbar-right">
             <li><a href="/Home">Home</a></li>
             {% if user.is_authenticated %}
-            <li><a href="/Notifications">Notifications</a></li>
+            <li class="dropdown">
+
+              <a class="dropdown-toggle" data-toggle="dropdown" > Notifications<span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="/PUC_Notifications">PUC </a></li>
+                <li><a class="dropdown-item" href="/License_Notifications">License</a></li>
+                <li><a class="dropdown-item" href="/Insurance_Notifications">Insurance</a></li>
+              </ul>
+            </li>
+            <!-- <li><a href="/Notifications">Notifications</a></li> -->
             <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span> &nbsp; Logout</a></li>
             {% else %}
             <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span> &nbsp; Log in</a></li>

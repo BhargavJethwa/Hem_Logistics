@@ -4,72 +4,14 @@
 
 <script>
     $(document).ready(function (){
+        $("#id_Driver").attr({"onchange":"driverFunc()"});
+        $("#id_Vehicle").attr({"onchange":"VehicleFunc()"});
         $("#id_Rate").hide();
         $("label[for='id_Rate']").empty();
-
-        $("#id_Driver").change(function() {
-            if($(this).val() != ""){
-                $('#id_Vehicle').show();
-                $('#id_Vehicle').attr('required', '');
-                $('#id_Vehicle').attr('data-error', 'This field is required.');
-                $("label[for='id_Vehicle']").text("RC Number: ");
-                $('#id_Vehicle').empty();
-                $driver_id = $(this).val();
-                $.ajax({
-                    type: "POST",
-                    url: "{% url 'favoriteAjax' %}",
-                    data: { action: "get_vehicles",
-                            driver_id: $driver_id,
-                            vehicle_id: null,
-                            csrfmiddlewaretoken: '{{ csrf_token }}' },
-                    dataType: 'json',
-                    success: function(response){
-                        $("#id_Vehicle").append("<option value selected> --------- </option>");
-                        $.each(response,function(i, v) {
-                            $("#id_Vehicle").append("<option value="+ v.pk +" > "+ v.fields.RC_number + " </option>");
-                        });
-                    }
-                });
-            }
-            else{
-                $("label[for='id_Vehicle']").empty();
-                $('#id_Vehicle').hide();
-            }
-        });
-        $("#id_Driver").trigger("change");
+        $('#id_Bank_detail').empty();
+        $('#id_Vehicle').empty();
 
 
-        $("#id_Vehicle").change(function() {
-            if($(this).val() != ""){
-                $('#id_Bank_detail').show();
-                $('#id_Bank_detail').attr('required', '');
-                $('#id_Bank_detail').attr('data-error', 'This field is required.');
-                $("label[for='id_Bank_detail']").text("Bank Account: ");
-                $('#id_Bank_detail').empty();
-                $vehicle_id = $(this).val();
-                $.ajax({
-                    type: "POST",
-                    url: "{% url 'favoriteAjax' %}",
-                    data: { action: "get_Bank_details",
-                            driver_id: null,
-                            vehicle_id: $vehicle_id,
-                            csrfmiddlewaretoken: '{{ csrf_token }}' },
-                    dataType: 'json',
-                    success: function(response){
-                        $("#id_Bank_detail").append("<option value selected> --------- </option>");
-                        $.each(response,function(i, v) {
-                            $("#id_Bank_detail").append("<option value="+ v.pk +" > "+ v.fields.Account_number + " </option>");
-                        });
-                    }
-                });
-            }
-            else{
-                $("label[for='id_Bank_detail']").empty();
-                $('#id_Bank_detail').hide();
-            }
-        });
-        $("#id_Vehicle").trigger("change");
-        
         $("#id_Rate_type").change(function() {
             if($(this).val() == "VARIABLE"){
                 $("#id_Rate").show();
@@ -98,10 +40,10 @@
         $("#add").click(function(e) {
             $i++;
             e.preventDefault();
-            $("#destination_"+($i-1)+"_unloading").after("<p id='space_"+$i+"'>&nbsp;</p>");
+            $("#destination_"+($i-1)+"_other_charges").after("<p id='space_"+$i+"'>&nbsp;</p>");
             $("#space_"+$i).after("<p><label for='destination_"+ $i +"'>Destination "+$i+":</label> <input type='text' name='destination_"+ $i +"' maxlength='50' required='' id='destination_"+$i+"'></p>");
-            $("#destination_"+ $i).after("<p><label for='destination_"+$i+"_loading'>Loading Charges:</label> <input type='number' name='destination_"+$i+"_loading' required='' id='destination_"+$i+"_loading'></p>");
-            $("#destination_"+$i+"_loading").after("<p><label for='destination_"+$i+"_unloading'>Unloading Charges:</label> <input type='number' name='destination_"+$i+"_unloading' required='' id='destination_"+$i+"_unloading'></p>");
+            $("#destination_"+ $i).after("<p><label for='destination_"+$i+"_load_unload'>Load/Unload Charges:</label> <input type='number' value=0 name='destination_"+$i+"_load_unload' required='' id='destination_"+$i+"_load_unload'></p>");
+            $("#destination_"+$i+"_load_unload").after("<p><label for='destination_"+$i+"_other_charges'>Other Charges:</label> <input type='number' value=0 name='destination_"+$i+"_other_charges' required='' id='destination_"+$i+"_other_charges'></p>");
         });
         $("#remove").click(function(e) {
             e.preventDefault();
@@ -113,45 +55,42 @@
                 $("#space_"+$i).remove();
                 $("label[for='destination_"+ $i+"']").remove();
                 $("#destination_"+ $i).remove();
-                $("label[for='destination_"+ $i+"_loading']").remove();
-                $("#destination_"+$i+"_loading").remove();
-                $("label[for='destination_"+ $i+"_unloading']").remove();
-                $("#destination_"+$i+"_unloading").remove();
+                $("label[for='destination_"+$i+"_load_unload']").remove();
+                $("#destination_"+$i+"_load_unload").remove();
+                $("label[for='destination_"+$i+"_other_charges']").remove();
+                $("#destination_"+$i+"_other_charges").remove();
                 $i--;
             }
         });
         $("#calculate").click(function(e) {
             e.preventDefault();
             var total = parseInt($('#id_Freight').val());
-            total += parseInt($('#id_Other_charges').val());
+            total += parseInt($('#source_load_unload').val());
+            total += parseInt($('#source_other_charge').val());
             for($j=1;$j<=$i;$j++){
-                total += parseInt($('#destination_'+$j+'_loading').val());
-                total += parseInt($('#destination_'+$j+'_unloading').val());
+                total += parseInt($('#destination_'+$j+'_load_unload').val());
+                total += parseInt($('#destination_'+$j+'_other_charges').val());
             }
             $('#Total_payment').val(total);
         });
 
-        function calculate_payment(){
-            var data = new FormData($('#trip_form'));
-            data.append("i",$i)
-            return true;
-        }
     });
 </script>
 
 <div class="container">
     <div class="row">
         <div class="col-md-4 col-md-offset-4" style="background-color: white; border-radius: 5%; padding: 20pt;margin-top:50pt ">
-        <form onsubmit="calculate_payment()" method="POST" action='/Add Trip Detail/' enctype="multipart/form-data">{% csrf_token %}
+        <form method="POST" action='/Add Trip Detail/' enctype="multipart/form-data">{% csrf_token %}
             <fieldset class="form-group">
                 <legend class="border-bottom mb-4">Trip Detail</legend>
                     <div class="form-group" id="trip_form">
                         {{form.as_p }}
-                        <p><label for="source_loading">Loading Charges:</label> <input type="number" name="source_loading" required="" id="source_loading"></p>
+                        <p><label for="source_load_unload">Load/Unload Charges:</label> <input type="number" value=0 name="source_load_unload" required="" id="source_load_unload"></p>
+                        <p><label for="source_other_charge">Other Charges:</label> <input type="number" value=0 name="source_other_charge" required="" id="source_other_charge"></p>
                         <p>&nbsp;</p>
                         <p><label for="destination_1">Destination 1:</label> <input type="text" maxlength="50" name="destination_1" required="" id="destination_1"></p>
-                        <p><label for="destination_1_loading">Loading Charges:</label> <input type="number" name="destination_1_loading" required="" id="destination_1_loading"></p>
-                        <p><label for="destination_1_unloading">Unloading Charges:</label> <input type="number" name="destination_1_unloading" required="" id="destination_1_unloading"></p>
+                        <p><label for="destination_1_load_unload">Load/Unload Charges:</label> <input type="number" value=0 name="destination_1_load_unload" required="" id="destination_1_load_unload"></p>
+                        <p><label for="destination_1_other_charges">Other Charges:</label> <input type="number" value=0 name="destination_1_other_charges" required="" id="destination_1_other_charges"></p>
 
                         <button class="btn btn-primary" style="font-size: 10px;" id="add"><span class="glyphicon glyphicon-plus-sign"></span></button>
                         <button class="btn btn-primary" style="font-size: 10px;" id="remove"><span class="glyphicon glyphicon-minus-sign"></span></button>
@@ -169,17 +108,70 @@
             <div class="form-group">
                 <button class="btn btn-primary" id="submit" name="submit" type="submit"><span class="glyphicon glyphicon-ok"></span> &nbsp; Submit</button> 
             </div>
-            <br>
-            <small class="text-muted ml-2">
-                <a class="ml-2" href="/Add Vehicle/">Add a Vehicle</a>
-            </small>
-            <br>
-            <small class="text-muted ml-2">
-                <a class="ml-2" href="/Add Driver/">Add a Driver</a>
-            </small>
         </form>
         </div>
     </div>
 </div>
 
+<script>
+    function driverFunc(){
+            if($("#id_Driver").val() != ""){
+                $('#id_Vehicle').show();
+                $('#id_Vehicle').attr('required', '');
+                $('#id_Vehicle').attr('data-error', 'This field is required.');
+                $("label[for='id_Vehicle']").text("RC Number: ");
+                $('#id_Vehicle').empty();
+                $driver_id = $("#id_Driver").val();
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'favoriteAjax' %}",
+                    data: { action: "get_vehicles",
+                            driver_id: $driver_id,
+                            vehicle_id: null,
+                            csrfmiddlewaretoken: '{{ csrf_token }}' },
+                    dataType: 'json',
+                    success: function(response){
+                        $("#id_Vehicle").append("<option value selected> --------- </option>");
+                        $.each(response,function(i, v) {
+                            $("#id_Vehicle").append("<option value="+ v.pk +" > "+ v.fields.RC_number + " </option>");
+                        });
+                    }
+                });
+            }
+            else{
+                $("label[for='id_Vehicle']").empty();
+                $('#id_Vehicle').hide();
+            }
+        }
+
+        function VehicleFunc(){
+            if($("#id_Vehicle").val() != ""){
+                $('#id_Bank_detail').show();
+                $('#id_Bank_detail').attr('required', '');
+                $('#id_Bank_detail').attr('data-error', 'This field is required.');
+                $("label[for='id_Bank_detail']").text("Bank Account: ");
+                $('#id_Bank_detail').empty();
+                $vehicle_id = $("#id_Vehicle").val();
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'favoriteAjax' %}",
+                    data: { action: "get_Bank_details",
+                            driver_id: null,
+                            vehicle_id: $vehicle_id,
+                            csrfmiddlewaretoken: '{{ csrf_token }}' },
+                    dataType: 'json',
+                    success: function(response){
+                        $("#id_Bank_detail").append("<option value selected> --------- </option>");
+                        $.each(response,function(i, v) {
+                            $("#id_Bank_detail").append("<option value="+ v.pk +" > "+ v.fields.Account_number + " </option>");
+                        });
+                    }
+                });
+            }
+            else{
+                $("label[for='id_Bank_detail']").empty();
+                $('#id_Bank_detail').hide();
+            }
+        }
+</script>
 {% endblock start %}

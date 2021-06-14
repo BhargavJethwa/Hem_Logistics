@@ -38,6 +38,7 @@ urlpatterns = [
     path('update_trip_detail/<int:id>', logistics_view.update_trip_detail, name='update_trip_detail'),
     path('edit_trip_detail/<int:id>', logistics_view.edit_trip_detail, name='edit_trip_detail'),
     path('delete_trip_detail/<int:id>', logistics_view.delete_trip_detail, name='delete_trip_detail'), 
+    path('finish_trip_detail/<int:id>', logistics_view.finish_trip_detail, name='delete_trip_detail'), 
     path('favoriteAjax/', logistics_view.favorite_ajax, name='favoriteAjax'),
 
     path('Add Vehicle/', logistics_view.vehicle, name='vehicle'), 
@@ -51,6 +52,12 @@ urlpatterns = [
     path('update_bank_detail/<int:id>', logistics_view.update_bank_detail, name='update_bank_detail'),
     path('edit_bank_detail/<int:id>', logistics_view.edit_bank_detail, name='edit_bank_detail'),
     path('delete_bank_detail/<int:id>', logistics_view.delete_bank_detail, name='delete_bank_detail'),
+
+    path('Add Client/', logistics_view.client, name='client'), 
+    path('Client/', logistics_view.show_client, name='show_client'),
+    path('update_client/<int:id>', logistics_view.update_client, name='update_client'),
+    path('edit_client/<int:id>', logistics_view.edit_client, name='edit_client'),
+    path('delete_client/<int:id>', logistics_view.delete_client, name='delete_client'),
 
     path('PUC_Notifications/', logistics_view.PUC_notifications, name ='PUC_Notifications'), 
     path('License_Notifications/', logistics_view.license_notifications, name ='License_Notifications'), 

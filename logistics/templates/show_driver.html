@@ -45,9 +45,8 @@
         </td>  
         {% if user.is_authenticated %}
         <td>  
-            <a href="/edit_driver/{{ x.id }}"><span class="glyphicon glyphicon-pencil" >Edit</span></a>  
-            
-            <a href="/delete_driver/{{ x.id }}"><span class="glyphicon glyphicon-remove" style="margin-left: 10px;" >Delete</span></a>  
+            <dt><a href="/edit_driver/{{ x.id }}"><span class="glyphicon glyphicon-pencil" >Edit</span></a></dt>
+            <dt><a href="/delete_driver/{{ x.id }}"><span class="glyphicon glyphicon-remove">Delete</span></a></dt>
         </td> 
         {% endif %} 
     </tr>  

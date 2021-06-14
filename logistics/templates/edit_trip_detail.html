@@ -2,24 +2,220 @@
 {% load crispy_forms_tags %}
 {% block start %}
 
+<script>
+    $(document).ready(function (){
+        
+        $("#id_Driver").attr({"onchange":"driverFunc()"});
+        $("#id_Driver").attr({"onclick":"driverFunc()"});
+        $("#id_Vehicle").attr({"onchange":"VehicleFunc()"});
+        $("#id_Rate").hide();
+        $("label[for='id_Rate']").empty();
+        
+        var ve_id = $('#id_Vehicle').val();
+        var ve = $("#id_Vehicle option:selected").text();
+        $('#id_Vehicle').empty();
+        $("#id_Vehicle").append("<option value> --------- </option>");
+        $('#id_Vehicle').append("<option value='"+ve_id+"' selected=''>"+ve+"</option>");
 
+        var b_id = $('#id_Bank_detail').val();
+        var b = $("#id_Bank_detail option:selected").text();
+        $('#id_Bank_detail').empty();
+        $("#id_Bank_detail").append("<option value> --------- </option>");
+        $('#id_Bank_detail').append("<option value='"+b_id+"' selected=''>"+b+"</option>");
+
+        
+
+        $("#id_Rate_type").change(function() {
+            if($(this).val() == "VARIABLE"){
+                $("#id_Rate").show();
+                $("#id_Freight").attr("disabled","");
+                $("label[for='id_Rate']").text("Rate: ");
+                $('#id_Freight').val("");
+                $("#id_Distance").keyup(function(){
+                    if($('#id_Rate').val()!="")
+                        $('#id_Freight').val($('#id_Rate').val()*$('#id_Distance').val());
+                });
+                $("#id_Rate").keyup(function(){
+                    if($('#id_Distance').val()!="")
+                        $('#id_Freight').val($('#id_Rate').val()*$('#id_Distance').val());
+                });
+            }
+            else{
+                $('#id_Freight').val("");
+                $("#id_Rate").hide();
+                $("#id_Freight").removeAttr("disabled");
+                $("label[for='id_Rate']").empty();
+            }
+        });
+        $("#Rate_type").trigger("change");
+        
+        $i=1;
+        
+        var destination = JSON.parse("{{trip_detail.Destination}}".replace(/(&quot\;)/g,"\""));
+        var LU = JSON.parse("{{trip_detail.Load_unload_charges}}".replace(/(&quot\;)/g,"\""));
+        var Other_charges = JSON.parse("{{trip_detail.Other_charges}}".replace(/(&quot\;)/g,"\""));
+        $('#source_load_unload').val(LU[0]);
+        $('#source_other_charge').val(Other_charges[0]);
+        $('#destination_1').val(destination[0]);
+        $('#destination_1_load_unload').val(Other_charges[1]);
+        $('#destination_1_other_charges').val(Other_charges[1]);
+        for( var index in destination ){
+            if(index==0)
+                continue;
+            $i++;
+            $("#destination_"+($i-1)+"_other_charges").after("<p id='space_"+$i+"'>&nbsp;</p>");
+            $("#space_"+$i).after("<p><label for='destination_"+ $i +"'>Destination "+$i+":</label> <input value="+destination[index]+" type='text' name='destination_"+ $i +"' maxlength='50' required='' id='destination_"+$i+"'></p>");
+            $("#destination_"+ $i).after("<p><label for='destination_"+$i+"_load_unload'>Load/Unload Charges:</label> <input value="+LU[parseInt(index)+1]+" type='number' value=0 name='destination_"+$i+"_load_unload' required='' id='destination_"+$i+"_load_unload'></p>");
+            $("#destination_"+$i+"_load_unload").after("<p><label for='destination_"+$i+"_other_charges'>Other Charges:</label> <input value="+Other_charges[parseInt(index)+1]+" type='number' value=0 name='destination_"+$i+"_other_charges' required='' id='destination_"+$i+"_other_charges'></p>");
+        }
+
+        $("#add").click(function(e) {
+            $i++;
+            e.preventDefault();
+            $("#destination_"+($i-1)+"_other_charges").after("<p id='space_"+$i+"'>&nbsp;</p>");
+            $("#space_"+$i).after("<p><label for='destination_"+ $i +"'>Destination "+$i+":</label> <input type='text' name='destination_"+ $i +"' maxlength='50' required='' id='destination_"+$i+"'></p>");
+            $("#destination_"+ $i).after("<p><label for='destination_"+$i+"_load_unload'>Load/Unload Charges:</label> <input type='number' value=0 name='destination_"+$i+"_load_unload' required='' id='destination_"+$i+"_load_unload'></p>");
+            $("#destination_"+$i+"_load_unload").after("<p><label for='destination_"+$i+"_other_charges'>Other Charges:</label> <input type='number' value=0 name='destination_"+$i+"_other_charges' required='' id='destination_"+$i+"_other_charges'></p>");
+        });
+        $("#remove").click(function(e) {
+            e.preventDefault();
+            if($i==1){
+                alert("need atleast 1 destination");
+            }
+            else{
+                $("label[for='space_"+ $i+"']").remove();
+                $("#space_"+$i).remove();
+                $("label[for='destination_"+ $i+"']").remove();
+                $("#destination_"+ $i).remove();
+                $("label[for='destination_"+$i+"_load_unload']").remove();
+                $("#destination_"+$i+"_load_unload").remove();
+                $("label[for='destination_"+$i+"_other_charges']").remove();
+                $("#destination_"+$i+"_other_charges").remove();
+                $i--;
+            }
+        });
+        $("#calculate").click(function(e) {
+            e.preventDefault();
+            var total = parseInt($('#id_Freight').val());
+            total += parseInt($('#source_load_unload').val());
+            total += parseInt($('#source_other_charge').val());
+            for($j=1;$j<=$i;$j++){
+                total += parseInt($('#destination_'+$j+'_load_unload').val());
+                total += parseInt($('#destination_'+$j+'_other_charges').val());
+            }
+            $('#Total_payment').val(total);
+        });
+
+    });
+</script>
 
 <div class="container">
     <div class="row">
         <div class="col-md-4 col-md-offset-4" style="background-color: white; border-radius: 5%; padding: 20pt;margin-top:50pt ">
-        <form method="POST" action='/update_trip_detail/{{trip_detail.id}}' enctype="multipart/form-data">{% csrf_token %}
+        <form method="POST" action='/Add Trip Detail/' enctype="multipart/form-data">{% csrf_token %}
             <fieldset class="form-group">
-                <legend class="border-bottom mb-4">Update Details</legend>
-                    <div class="form-group">
+                <legend class="border-bottom mb-4">Trip Detail</legend>
+                    <div class="form-group" id="trip_form">
                         {{form.as_p }}
+                        <p><label for="source_load_unload">Load/Unload Charges:</label> <input type="number" value=0 name="source_load_unload" required="" id="source_load_unload"></p>
+                        <p><label for="source_other_charge">Other Charges:</label> <input type="number" value=0 name="source_other_charge" required="" id="source_other_charge"></p>
+                        <p>&nbsp;</p>
+                        <p><label for="destination_1">Destination 1:</label> <input type="text" maxlength="50" name="destination_1" required="" id="destination_1"></p>
+                        <p><label for="destination_1_load_unload">Load/Unload Charges:</label> <input type="number" value=0 name="destination_1_load_unload" required="" id="destination_1_load_unload"></p>
+                        <p><label for="destination_1_other_charges">Other Charges:</label> <input type="number" value=0 name="destination_1_other_charges" required="" id="destination_1_other_charges"></p>
+
+                        <button class="btn btn-primary" style="font-size: 10px;" id="add"><span class="glyphicon glyphicon-plus-sign"></span></button>
+                        <button class="btn btn-primary" style="font-size: 10px;" id="remove"><span class="glyphicon glyphicon-minus-sign"></span></button>
+
+                        <p>&nbsp;</p>
+                        <p><label for="Total_payment">Total Payment:</label> 
+                            <input type="number" disabled="" name="Total_payment" id="Total_payment">
+                        </p>
+                        <p>
+                            &nbsp; 
+                            <button class="btn btn-secondary" style="font-size: 10px;" id="calculate"> Calculate</button>
+                        </p>
                     </div>
             </fieldset>
             <div class="form-group">
-                <button class="btn btn-primary" id="submit" name="submit" type="submit"><span class="glyphicon glyphicon-log-in"></span> &nbsp; Add</button> 
+                <button class="btn btn-primary" id="submit" name="submit" type="submit"><span class="glyphicon glyphicon-ok"></span> &nbsp; Submit</button> 
             </div>
         </form>
         </div>
     </div>
 </div>
 
+<script>
+    function driverFunc(){
+            if($("#id_Driver").val() != ""){
+                $('#id_Vehicle').show();
+                $('#id_Vehicle').attr('required', '');
+                $('#id_Vehicle').attr('data-error', 'This field is required.');
+                $("label[for='id_Vehicle']").text("RC Number: ");
+                var ve_id = $('#id_Vehicle').val();
+                console.log(ve_id);
+                $('#id_Vehicle').empty();
+                $driver_id = $("#id_Driver").val();
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'favoriteAjax' %}",
+                    data: { action: "get_vehicles",
+                            driver_id: $driver_id,
+                            vehicle_id: null,
+                            csrfmiddlewaretoken: '{{ csrf_token }}' },
+                    dataType: 'json',
+                    success: function(response){
+                        $("#id_Vehicle").append("<option value > --------- </option>");
+                        $.each(response,function(i, v) {
+                            console.log(v.pk);
+                            if(v.pk==ve_id)
+                                $("#id_Vehicle").append("<option value="+ v.pk +" selected> "+ v.fields.RC_number + " </option>");
+                            else
+                                $("#id_Vehicle").append("<option value="+ v.pk +" > "+ v.fields.RC_number + " </option>");
+                        });
+                    }
+                });
+            }
+            else{
+                $("label[for='id_Bank_detail']").empty();
+                $('#id_Bank_detail').hide();
+                $("label[for='id_Vehicle']").empty();
+                $('#id_Vehicle').hide();
+            }
+        }
+
+        function VehicleFunc(){
+            if($("#id_Vehicle").val() != ""){
+                $('#id_Bank_detail').show();
+                $('#id_Bank_detail').attr('required', '');
+                $('#id_Bank_detail').attr('data-error', 'This field is required.');
+                $("label[for='id_Bank_detail']").text("Bank Account: ");
+                var b_id = $('#id_Bank_detail').val();
+                $('#id_Bank_detail').empty();
+                $vehicle_id = $("#id_Vehicle").val();
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'favoriteAjax' %}",
+                    data: { action: "get_Bank_details",
+                            driver_id: null,
+                            vehicle_id: $vehicle_id,
+                            csrfmiddlewaretoken: '{{ csrf_token }}' },
+                    dataType: 'json',
+                    success: function(response){
+                        $("#id_Bank_detail").append("<option value > --------- </option>");
+                        $.each(response,function(i, v) {
+                            if(b_id==v.pk)
+                                $("#id_Bank_detail").append("<option value="+ v.pk +" selected> "+ v.fields.Account_number + " </option>");
+                            else
+                                $("#id_Bank_detail").append("<option value="+ v.pk +" > "+ v.fields.Account_number + " </option>");
+                        });
+                    }
+                });
+            }
+            else{
+                $("label[for='id_Bank_detail']").empty();
+                $('#id_Bank_detail').hide();
+            }
+        }
+</script>
 {% endblock start %}

@@ -17,12 +17,17 @@
 <table id="table" class="table table-striped" style="overflow-y: scroll; height: 1px;">  
     <thead class="thead-dark">  
     <tr>  
+        <th>Client</th>  
         <th>RC Number</th>  
         <th>Driver's Name</th>  
-        <th>Trip ID</th>  
-        <th>Source</th>
-        <th>Total Payment</th>
+        <!-- <th>Trip ID</th>   -->
+        <th>Path</th>
+        <th>Rate</th>
+        <th>Distance(Km)</th>
+        <th>L/U Charges</th>
+        <th>Other Charges</th>
         <th>Advance Payment</th>
+        <th>Total Payment</th>
         {% if user.is_authenticated %} 
         <th>Actions</th>  
         {% endif %}
@@ -31,16 +36,28 @@
     <tbody>  
 {% for x in trip_detail %}  
     <tr>  
+        <td>{{ x.Client }}</td>  
         <td>{{ x.Vehicle }}</td>  
         <td>{{ x.Driver }}</td>  
-        <td>{{ x.Trip_id }}</td>  
-        <td>{{ x.Source }}</td>
-        <td>{{ x.Total_payment }}</td>
+        <!-- <td>{{ x.Trip_id }}</td>   -->
+        <td id = "{{x.id}}_Path" >
+            <dt style="font-weight: normal;">{{ x.Source }}</dt>
+        </td>
+        <td id="{{x.id}}_Rate"></td>
+        <td>x.Distance</td>
+        <td id = "{{x.id}}_LU">
+            <dt></dt>
+        </td>
+        <td id="{{x.id}}_other">
+            <dt></dt>
+        </td>
         <td>{{ x.Advance_payment }}</td>
+        <td>{{ x.Total_payment }}</td>
         {% if user.is_authenticated %}
-        <td>  
-            <a href="/edit_trip_detail/{{ x.id }}"><span class="glyphicon glyphicon-pencil" >Edit</span></a>  
-            <a href="/delete_trip_detail/{{ x.id }}"><span class="glyphicon glyphicon-remove" style="margin-left: 10px;" >Delete</span></a>  
+        <td id="{{x.id}}_action">  
+            <dt><a href="/edit_trip_detail/{{ x.id }}"><span class="glyphicon glyphicon-pencil" >Edit</span></a></dt>
+            <dt><a href="/delete_trip_detail/{{ x.id }}"><span class="glyphicon glyphicon-remove" >Delete</span></a></dt>
+            
         </td> 
         {% endif %} 
     </tr>  
@@ -54,4 +71,23 @@
 <br>  
 <br>  
 
+{% for x in trip_detail %}
+    <script>
+        if("{{x.Rate_type}}"=="FIX")
+            $('#{{x.id}}_Rate').html("FIX");
+        else
+            $('#{{x.id}}_Rate').html("{{x.Rate}}");
+        var destination = JSON.parse("{{x.Destination}}".replace(/(&quot\;)/g,"\""));
+        var LU = JSON.parse("{{x.Load_unload_charges}}".replace(/(&quot\;)/g,"\""));
+        var Other_charges = JSON.parse("{{x.Other_charges}}".replace(/(&quot\;)/g,"\""));
+        for(var i in destination)
+            $('#{{x.id}}_Path').append("<dt style='font-weight: normal;'>"+destination[i]+"</dt>");
+        for(var i in LU)
+            $('#{{x.id}}_LU').append("<dt style='font-weight: normal;'>"+LU[i]+"</dt>");
+        for(var i in Other_charges)
+            $('#{{x.id}}_other').append("<dt style='font-weight: normal;'>"+Other_charges[i]+"</dt>");
+        if("{{x.Finished}}"=="False")
+            $("#{{x.id}}_action").append("<dt><a href='/finish_trip_detail/{{ x.id }}'><span class='glyphicon glyphicon-ok' >Finish</span></a></dt>");
+    </script>
+{% endfor %}
 {% endblock start %}

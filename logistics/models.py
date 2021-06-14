@@ -48,7 +48,7 @@ class Vehicle(models.Model):
         return self.RC_number
 
 class Driver(models.Model):
-    Name = models.CharField(max_length=50, verbose_name="Driver's Name")
+    Name = models.CharField(max_length=50)
     License_number = models.CharField(verbose_name="DL Number", unique=True, max_length=15, validators=[MinLengthValidator(15,message = "Invalid License Number")])
     License_expiry = models.DateField(verbose_name="License Expiry", validators=[date_validate])#,input_formats = ['%d/%m/%Y'])
     Contact_number = models.CharField(verbose_name="Contact Number", max_length=10,validators=[RegexValidator('[0-9]{10}',message = "Invalid Number")])
@@ -62,7 +62,18 @@ class Driver(models.Model):
     def __str__(self):
         return self.Name
 
+class Client(models.Model):
+    Name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.Name
+
 class Trip_detail(models.Model):
+    Client = models.ForeignKey(
+        'Client',
+        verbose_name="Client's Name",
+        on_delete=models.RESTRICT,
+    )
     Driver = models.ForeignKey(
         'Driver',
         verbose_name="Driver's Name",
@@ -82,15 +93,15 @@ class Trip_detail(models.Model):
     Total_payment = models.IntegerField(validators=[MinValueValidator(0)])
     Rate_type = models.CharField(verbose_name="Rate Type", choices=(('FIX','FIX'),('VARIABLE','VARIABLE'),),max_length=8)
     Distance = models.IntegerField(verbose_name="Distance (Kms)",validators=[MinValueValidator(0)])
-    Rate = models.IntegerField(validators=[MinValueValidator(0)], blank=True)
+    Rate = models.IntegerField(default=8,validators=[MinValueValidator(0)], blank=True)
     Freight = models.IntegerField(validators=[MinValueValidator(0)])
-    Other_charges = models.IntegerField(verbose_name="Other Charges", validators=[MinValueValidator(0)])
     Advance_payment = models.IntegerField(validators=[MinValueValidator(0)])
     Date_created=models.DateField(auto_now_add=True)
     Source = models.CharField(max_length=50)
     Destination = models.TextField()
-    Load_charges = models.TextField()
-    Unload_charges = models.TextField()
+    Load_unload_charges = models.TextField()
+    Other_charges = models.TextField()
+    Finished=models.BooleanField(default=False)
 
     def __str__(self):
         return self.Trip_id

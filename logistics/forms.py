@@ -4,7 +4,7 @@ from django.forms import widgets
 from searchableselect.widgets import SearchableSelect
 
 #import models from models.py
-from .models import Trip_detail,Vehicle,Driver,Bank_detail
+from .models import Trip_detail,Vehicle,Driver,Bank_detail,Client
 
 
 class Trip_detailForm(forms.ModelForm):
@@ -12,7 +12,7 @@ class Trip_detailForm(forms.ModelForm):
     class Meta:
         model = Trip_detail
         # fields = "__all__"
-        exclude = ['Date_created','unload_charges','load_charges','destination','Total_payment','Destination','Load_charges','Unload_charges']
+        exclude = ['Date_created','Finished','Total_payment','Destination','Other_charges','Load_unload_charges']
 
 
 class VehicleForm(forms.ModelForm):
@@ -47,4 +47,10 @@ class Bank_detailForm(forms.ModelForm):
     # specify the name of model to use
     class Meta:
         model = Bank_detail
+        fields = "__all__"
+
+class ClientForm(forms.ModelForm):
+    # specify the name of model to use
+    class Meta:
+        model = Client
         fields = "__all__"

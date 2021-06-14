@@ -1,15 +1,14 @@
-from logistics.forms import DriverForm,Trip_detailForm, VehicleForm,Bank_detailForm
+from logistics.forms import DriverForm,Trip_detailForm, VehicleForm,Bank_detailForm,ClientForm
 from django.shortcuts import render, redirect 
 from django.contrib.auth import authenticate, login 
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
-from .models import Bank_detail, Driver,Vehicle,Trip_detail
+from .models import Bank_detail, Driver,Vehicle,Trip_detail,Client
 from .helper_functions import check_expiry_insurance,check_expiry_license,check_expiry_PUC
 from django.http import HttpResponse, JsonResponse
 from django.core import serializers
 import json
 from pprint import pprint
-import simplejson as sjson
 
 # Create your views here.
 
@@ -41,11 +40,12 @@ def update_driver(request,id):
 	form = DriverForm(request.POST, instance=driver)
 	if form.is_valid():
 		form.save()
+		messages.success(request, 'Updated successfully!!!')
 		return redirect("/Driver")
 	return render(request,'edit_driver.html', {'title':'Update Driver Details', 'form':form, 'driver':driver})
 			
 def delete_driver(request,id):
-	driver = Driver.objects.filter(id=id)
+	driver = Driver.objects.get(id=id)
 	driver.delete()
 	return redirect("/Driver")
 
@@ -78,12 +78,19 @@ def update_trip_detail(request,id):
 	form = Trip_detailForm(request.POST, instance=trip_detail)
 	if form.is_valid():
 		form.save()
+		messages.success(request, 'Updated successfully!!!')
 		return redirect("/Trip Detail")
 	return render(request,'edit_trip_detail.html', {'title':'Update Trip Details', 'form':form,'trip_detail':trip_detail})
-			
+	
 def delete_trip_detail(request,id):
-	trip_detail = Trip_detail.objects.filter(id=id)
+	trip_detail = Trip_detail.objects.get(id=id)
 	trip_detail.delete()
+	return redirect("/Trip Detail")
+
+def finish_trip_detail(request,id):
+	trip_detail = Trip_detail.objects.get(id=id)
+	trip_detail.Finished=True
+	trip_detail.save()
 	return redirect("/Trip Detail")
 
 def trip_detail(request):						
@@ -94,35 +101,34 @@ def trip_detail(request):
 			# pprint(request.POST)
 			# form.save()
 			trip=Trip_detail()
+			trip.Client=Client.objects.get(id=request.POST.get('Client'))
 			trip.Driver=Driver.objects.get(id=request.POST.get('Driver'))
 			trip.Vehicle=Vehicle.objects.get(id=request.POST.get('Vehicle'))
 			trip.Bank_detail=Bank_detail.objects.get(id=request.POST.get('Bank_detail'))
 			trip.Trip_id=request.POST.get('Trip_id')
 			trip.Rate_type=request.POST.get('Rate_type')
 			trip.Distance=request.POST.get('Distance')
-			if request.POST.get('Rate') is not '':
+			if request.POST.get('Rate') != '':
 				trip.Rate=request.POST.get('Rate')
 			else:
 				trip.Rate=0
 			trip.Freight=request.POST.get('Freight')
-			trip.Other_charges=request.POST.get('Other_charges')
 			trip.Advance_payment=request.POST.get('Advance_payment')
 			trip.Source=request.POST.get('Source')
 			i=1
 			Destination=[]
-			loading_charges=[]
-			unloading_charges=[]
-			loading_charges.append(request.POST.get('source_loading'))
-			total_payment=int(trip.Freight)+int(trip.Other_charges)+int(loading_charges[0])
+			load_unload_charges=[request.POST.get('source_load_unload')]
+			other_charges=[request.POST.get('source_other_charge')]
+			total_payment=int(trip.Freight)+int(load_unload_charges[0])+int(other_charges[0])
 			while(request.POST.get('destination_'+str(i)) is not None):
 				Destination.append(request.POST.get('destination_'+str(i)))
-				loading_charges.append(request.POST.get('destination_'+str(i)+'_loading'))
-				unloading_charges.append(request.POST.get('destination_'+str(i)+'_unloading'))
-				total_payment = total_payment+int(loading_charges[i])+int(unloading_charges[i-1])
+				load_unload_charges.append(request.POST.get('destination_'+str(i)+'_load_unload'))
+				other_charges.append(request.POST.get('destination_'+str(i)+'_other_charges'))
+				total_payment = total_payment+int(load_unload_charges[i])+int(other_charges[i])
 				i=i+1
 			trip.Destination=json.dumps(Destination)
-			trip.Load_charges=json.dumps(loading_charges)
-			trip.Unload_charges=json.dumps(unloading_charges)
+			trip.Load_unload_charges=json.dumps(load_unload_charges)
+			trip.Other_charges=json.dumps(other_charges)
 			trip.Total_payment = total_payment
 			
 			trip.save()			
@@ -177,11 +183,12 @@ def update_vehicle(request,id):
 	form = VehicleForm(request.POST, instance=vehicle)
 	if form.is_valid():
 		form.save()
+		messages.success(request, 'Updated successfully!!!')
 		return redirect("/Vehicle")
 	return render(request,'edit_vehicle.html', {'title':'Update Vehicle Details', 'form':form, 'vehicle':vehicle})
 			
 def delete_vehicle(request,id):
-	vehicle = Vehicle.objects.filter(id=id)
+	vehicle = Vehicle.objects.get(id=id)
 	vehicle.delete()
 	return redirect("/Vehicle")
 
@@ -201,7 +208,7 @@ def vehicle(request):
 
 def show_bank_detail(request):
 	bank_detail = Bank_detail.objects.all()
-	return render(request, 'show_bank_detail.html', {'title':'Driver', 'bank_detail':bank_detail })
+	return render(request, 'show_bank_detail.html', {'title':'Bank Detail', 'bank_detail':bank_detail })
 
 def edit_bank_detail(request,id):
 	bank_detail = Bank_detail.objects.get(id=id) 
@@ -213,11 +220,12 @@ def update_bank_detail(request,id):
 	form = Bank_detailForm(request.POST, instance=bank_detail)
 	if form.is_valid():
 		form.save()
+		messages.success(request, 'Updated successfully!!!')
 		return redirect("/Bank Detail")
 	return render(request,'edit_bank_detail.html', {'title':'Update Bank Details', 'form':form, 'bank_detail':bank_detail})
 			
 def delete_bank_detail(request,id):
-	bank_detail = Bank_detail.objects.filter(id=id)
+	bank_detail = Bank_detail.objects.get(id=id)
 	bank_detail.delete()
 	return redirect("/Bank Detail")
 
@@ -232,6 +240,43 @@ def bank_detail(request):
 			return redirect("/Bank Detail")
 
 	return render(request, 'bank_detail.html', {'form': form, 'title':'Add Bank Detail'})
+
+################ Client ################################################### 
+
+def show_client(request):
+	client = Client.objects.all()
+	return render(request, 'show_client.html', {'title':'Client', 'client':client })
+
+def edit_client(request,id):
+	client = Client.objects.get(id=id) 
+	form = ClientForm(instance=client) 
+	return render(request,'edit_client.html', {'title':'Update Client', 'form':form, 'client':client})
+
+def update_client(request,id):
+	client = Client.objects.get(id=id)
+	form = ClientForm(request.POST, instance=client)
+	if form.is_valid():
+		form.save()
+		messages.success(request, 'Updated successfully!!!')
+		return redirect("/Client")
+	return render(request,'edit_client.html', {'title':'Update client', 'form':form, 'client':client})
+			
+def delete_client(request,id):
+	client = Client.objects.get(id=id)
+	client.delete()
+	return redirect("/Client")
+
+def client(request):
+	form = ClientForm()
+	if request.method=='POST':
+		form = ClientForm(request.POST)
+		if form.is_valid():
+			form.save()
+			messages.success(request, 'Added successfully!!!')
+			form = ClientForm()
+			return redirect("/Client")
+
+	return render(request, 'client.html', {'form': form, 'title':'Add Client'})
 
 ################ login forms ################################################### 
 

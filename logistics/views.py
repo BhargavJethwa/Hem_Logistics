@@ -74,13 +74,43 @@ def edit_trip_detail(request,id):
 	return render(request,'edit_trip_detail.html', {'title':'Update Trip Detail', 'form':form,'trip_detail':trip_detail})
 
 def update_trip_detail(request,id):
-	trip_detail = Trip_detail.objects.get(id=id)
-	form = Trip_detailForm(request.POST, instance=trip_detail)
+	trip = Trip_detail.objects.get(id=id)
+	form = Trip_detailForm(request.POST, instance=trip)
 	if form.is_valid():
-		form.save()
+		trip.Client=Client.objects.get(id=request.POST.get('Client'))
+		trip.Driver=Driver.objects.get(id=request.POST.get('Driver'))
+		trip.Vehicle=Vehicle.objects.get(id=request.POST.get('Vehicle'))
+		trip.Bank_detail=Bank_detail.objects.get(id=request.POST.get('Bank_detail'))
+		trip.Trip_id=request.POST.get('Trip_id')
+		trip.Rate_type=request.POST.get('Rate_type')
+		trip.Distance=request.POST.get('Distance')
+		if request.POST.get('Rate') != '':
+			trip.Rate=request.POST.get('Rate')
+		else:
+			trip.Rate=0
+		trip.Freight=request.POST.get('Freight')
+		trip.Advance_payment=request.POST.get('Advance_payment')
+		trip.Source=request.POST.get('Source')
+		i=1
+		Destination=[]
+		load_unload_charges=[request.POST.get('source_load_unload')]
+		other_charges=[request.POST.get('source_other_charge')]
+		total_payment=int(trip.Freight)+int(load_unload_charges[0])+int(other_charges[0])
+		while(request.POST.get('destination_'+str(i)) is not None):
+			Destination.append(request.POST.get('destination_'+str(i)))
+			load_unload_charges.append(request.POST.get('destination_'+str(i)+'_load_unload'))
+			other_charges.append(request.POST.get('destination_'+str(i)+'_other_charges'))
+			total_payment = total_payment+int(load_unload_charges[i])+int(other_charges[i])
+			i=i+1
+		trip.Destination=json.dumps(Destination)
+		trip.Load_unload_charges=json.dumps(load_unload_charges)
+		trip.Other_charges=json.dumps(other_charges)
+		trip.Total_payment = total_payment
+		
+		trip.save()			
 		messages.success(request, 'Updated successfully!!!')
 		return redirect("/Trip Detail")
-	return render(request,'edit_trip_detail.html', {'title':'Update Trip Details', 'form':form,'trip_detail':trip_detail})
+	return render(request,'edit_trip_detail.html', {'title':'Update Trip Details', 'form':form,'trip_detail':trip})
 	
 def delete_trip_detail(request,id):
 	trip_detail = Trip_detail.objects.get(id=id)

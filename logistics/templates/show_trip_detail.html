@@ -19,15 +19,15 @@
     <tr>  
         <th>Client</th>  
         <th>RC Number</th>  
-        <th>Driver's Name</th>  
+        <th>Driver</th>  
         <!-- <th>Trip ID</th>   -->
         <th>Path</th>
         <th>Rate</th>
         <th>Distance(Km)</th>
-        <th>L/U Charges</th>
+        <th>U/L</th>
         <th>Other Charges</th>
-        <th>Advance Payment</th>
-        <th>Total Payment</th>
+        <th>Advance</th>
+        <th>Total</th>
         {% if user.is_authenticated %} 
         <th>Actions</th>  
         {% endif %}
@@ -37,14 +37,18 @@
 {% for x in trip_detail %}  
     <tr>  
         <td>{{ x.Client }}</td>  
-        <td>{{ x.Vehicle }}</td>  
-        <td>{{ x.Driver }}</td>  
+        <td >
+            <button class="astext" id = {{x.id}}{{x.Vehicle.id}}>{{ x.Vehicle }}</button>
+        </td>  
+        <td>
+            <button class="astext" id = {{x.id}}_{{x.Driver.id}}>{{ x.Driver }}</button>
+        </td>  
         <!-- <td>{{ x.Trip_id }}</td>   -->
         <td id = "{{x.id}}_Path" >
             <dt style="font-weight: normal;">{{ x.Source }}</dt>
         </td>
         <td id="{{x.id}}_Rate"></td>
-        <td>x.Distance</td>
+        <td>{{x.Distance}}</td>
         <td id = "{{x.id}}_LU">
             <dt></dt>
         </td>
@@ -56,7 +60,7 @@
         {% if user.is_authenticated %}
         <td id="{{x.id}}_action">  
             <dt><a href="/edit_trip_detail/{{ x.id }}"><span class="glyphicon glyphicon-pencil" >Edit</span></a></dt>
-            <dt><a href="/delete_trip_detail/{{ x.id }}"><span class="glyphicon glyphicon-remove" >Delete</span></a></dt>
+            <dt><a href="/delete_trip_detail/{{ x.id }}" class="confirm-delete"><span class="glyphicon glyphicon-remove" >Delete</span></a></dt>
             
         </td> 
         {% endif %} 
@@ -87,7 +91,100 @@
         for(var i in Other_charges)
             $('#{{x.id}}_other').append("<dt style='font-weight: normal;'>"+Other_charges[i]+"</dt>");
         if("{{x.Finished}}"=="False")
-            $("#{{x.id}}_action").append("<dt><a href='/finish_trip_detail/{{ x.id }}'><span class='glyphicon glyphicon-ok' >Finish</span></a></dt>");
+            $("#{{x.id}}_action").append("<dt><a href='/finish_trip_detail/{{ x.id }}' class='confirm-finish'><span class='glyphicon glyphicon-ok' >Finish</span></a></dt>");
     </script>
 {% endfor %}
+
+<div class= "modal_container" id="vehicle_modal_container">
+    <div class="modalll" style="top:15%;">
+      <div>
+        <p id=Owner></p>
+        <p id=RC_number></p>
+        <p id=PAN_number></p>
+        <p id=Type></p>
+        <p id=Other></p>
+        <p id=Insurance_policy_number></p>
+        <p id=Insurance_expiry_date></p>
+        <p id=PUC_expiry_date></p>
+        <p id=Safety_equipments></p>
+        <p id=GPS></p>
+        <p id=Contact_number></p>
+        <hr style="height:2px;border-width:0;color:gray;background-color:gray">
+        <center>
+            <button id=close_vehicle style="padding: 5px;" class="btn btn-primary">Close me</button>
+        </center>
+      </div>
+
+    </div>
+</div>
+
+<div class= "modal_container" id="driver_modal_container">
+    <div class="modalll" style="top:25%;">
+      <div>
+        <p id=Name></p>
+        <p id=License_number></p>
+        <p id=License_expiry></p>
+        <p id=Contact_number></p>
+        <!-- <p id=Vehicle></p> -->
+        <hr style="height:2px;border-width:0;color:gray;background-color:gray">
+        <center>
+            <button id=close_driver style="padding: 5px;" class="btn btn-primary">Close me</button>
+        </center>
+      </div>
+
+    </div>
+</div>
+
+<br />  
+<br />  
+{% for x in trip_detail %}
+    <script>
+        document.getElementById('{{x.id}}{{x.Vehicle.id}}').addEventListener('click',()=>{
+            document.getElementById('vehicle_modal_container').classList.add('show');
+            console.log("{{x.Vehicle.RC_number}}");
+            $('#Owner').html("Owner: {{ x.Vehicle.Owner }}");
+            $('#RC_number').html("RC Number:  {{ x.Vehicle.RC_number }}");
+            $('#PAN_number').html("PAN number:  {{ x.Vehicle.PAN_number }}");
+            if("{{x.Vehicle.Type}}" != "OTHER"){
+                $('#Type').html("Vehicle Type:  {{ x.Vehicle.Type }}");
+            }
+            else{
+                $('#Other').html("Vehicle Type:  {{ x.Vehicle.Other }}");
+            }
+            $('#Insurance_policy_number').html("Insurance policy number:  {{ x.Vehicle.Insurance_policy_number }}");
+            $('#Insurance_expiry_date').html("Insurance expiry date:  {{ x.Vehicle.Insurance_expiry_date }}");
+            $('#PUC_expiry_date').html("PUC expiry date:  {{ x.Vehicle.PUC_expiry_date }}");
+            $('#Safety_equipments').html("Safety equipments:  {{ x.Vehicle.Safety_equipments }}");
+            $('#GPS').html("GPS:  {{ x.Vehicle.GPS }}");
+            $('#Contact_number').html("Contact number:  {{ x.Vehicle.Contact_number }}");
+
+        });
+        document.getElementById('{{x.id}}_{{x.Driver.id}}').addEventListener('click',()=>{
+            document.getElementById('driver_modal_container').classList.add('show');
+            console.log("{{x.Driver.Name}}");
+            $('#Name').html("Name: {{ x.Driver.Name }}");
+            $('#License_number').html("License Number:  {{ x.Driver.License_number }}");
+            $('#License_expiry').html("License Expiry:  {{ x.Driver.License_expiry }}");
+            $('#Contact_number').html("Contact Number:  {{ x.Driver.Contact_number }}");
+        });
+    </script>
+{% endfor %}
+<script>
+    document.getElementById('close_vehicle').addEventListener('click',()=>{
+        document.getElementById('vehicle_modal_container').classList.remove('show');
+    });
+    document.getElementById('close_driver').addEventListener('click',()=>{
+        document.getElementById('driver_modal_container').classList.remove('show');
+    });
+</script>
+
+
+<script>
+    $(document).on('click', '.confirm-delete', function(){
+        return confirm('Are you sure you want to delete this?');
+    });
+    $(document).on('click', '.confirm-finish', function(){
+        return confirm('Are you sure you want to finish this trip?');
+    });
+</script>
 {% endblock start %}

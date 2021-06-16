@@ -1,40 +1,44 @@
 from logistics.forms import DriverForm,Trip_detailForm, VehicleForm,Bank_detailForm,ClientForm
 from django.shortcuts import render, redirect 
 from django.contrib.auth import authenticate, login 
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from .models import Bank_detail, Driver,Vehicle,Trip_detail,Client
 from .helper_functions import check_expiry_insurance,check_expiry_license,check_expiry_PUC
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.core import serializers
 import json
-from pprint import pprint
 
 # Create your views here.
 
 #################### index ####################################### 
+@login_required(login_url='/login')
 def index(request):
 	return redirect('home')
 
+@login_required(login_url='/login')
 def home(request): 
 	return render(request, 'index.html', {'title':'Home'}) 
 
 #################### contact us ####################################### 
-
+@login_required(login_url='/login')
 def contact_us(request): 
 	return render(request, 'contact_us.html', {'title':'Contact us'}) 
 
 #################### Driver ####################################### 
-
+@login_required(login_url='/login')
 def show_driver(request):
 	driver = Driver.objects.order_by('Name')
 	return render(request, 'show_driver.html', {'title':'Driver', 'driver':driver })
 
+@login_required(login_url='/login')
 def edit_driver(request,id):
 	driver = Driver.objects.get(id=id) 
 	form = DriverForm(instance=driver) 
 	return render(request,'edit_driver.html', {'title':'Update Driver Details', 'form':form, 'driver':driver})
 
+@login_required(login_url='/login')
 def update_driver(request,id):
 	driver = Driver.objects.get(id=id)
 	form = DriverForm(request.POST, instance=driver)
@@ -44,11 +48,13 @@ def update_driver(request,id):
 		return redirect("/Driver")
 	return render(request,'edit_driver.html', {'title':'Update Driver Details', 'form':form, 'driver':driver})
 			
+@login_required(login_url='/login')
 def delete_driver(request,id):
 	driver = Driver.objects.get(id=id)
 	driver.delete()
 	return redirect("/Driver")
 
+@login_required(login_url='/login')
 def driver(request):
 	form = DriverForm()
 	if request.method=='POST':
@@ -62,17 +68,19 @@ def driver(request):
 	return render(request, 'driver.html', {'form': form, 'title':'Add Driver'})
 
 #################### Trip_detail ####################################### 
-
+@login_required(login_url='/login')
 def show_trip_detail(request):
-	trip_detail = Trip_detail.objects.order_by('Date_created')
+	trip_detail = Trip_detail.objects.order_by('Finished')
 
 	return render(request, 'show_trip_detail.html', {'title':'Trip Detail', 'trip_detail':trip_detail })
 
+@login_required(login_url='/login')
 def edit_trip_detail(request,id):
 	trip_detail = Trip_detail.objects.get(id=id) 
 	form = Trip_detailForm(instance=trip_detail) 
 	return render(request,'edit_trip_detail.html', {'title':'Update Trip Detail', 'form':form,'trip_detail':trip_detail})
 
+@login_required(login_url='/login')
 def update_trip_detail(request,id):
 	trip = Trip_detail.objects.get(id=id)
 	form = Trip_detailForm(request.POST, instance=trip)
@@ -112,17 +120,20 @@ def update_trip_detail(request,id):
 		return redirect("/Trip Detail")
 	return render(request,'edit_trip_detail.html', {'title':'Update Trip Details', 'form':form,'trip_detail':trip})
 	
+@login_required(login_url='/login')
 def delete_trip_detail(request,id):
 	trip_detail = Trip_detail.objects.get(id=id)
 	trip_detail.delete()
 	return redirect("/Trip Detail")
 
+@login_required(login_url='/login')
 def finish_trip_detail(request,id):
 	trip_detail = Trip_detail.objects.get(id=id)
 	trip_detail.Finished=True
 	trip_detail.save()
 	return redirect("/Trip Detail")
 
+@login_required(login_url='/login')
 def trip_detail(request):						
 	form = Trip_detailForm()
 	if request.method=='POST':
@@ -199,15 +210,18 @@ def favorite_ajax(request):
 
 #################### Vehicle ####################################### 
 
+@login_required(login_url='/login')
 def show_vehicle(request):
 	vehicle = Vehicle.objects.all()
 	return render(request, 'show_vehicle.html', {'title':'Vehicle', 'vehicle':vehicle })
 
+@login_required(login_url='/login')
 def edit_vehicle(request,id):
 	vehicle = Vehicle.objects.get(id=id) 
 	form = VehicleForm(instance=vehicle) 
 	return render(request,'edit_vehicle.html', {'title':'Update Vehicle Details', 'form':form,'vehicle':vehicle})
 
+@login_required(login_url='/login')
 def update_vehicle(request,id):
 	vehicle = Vehicle.objects.get(id=id)
 	form = VehicleForm(request.POST, instance=vehicle)
@@ -217,11 +231,13 @@ def update_vehicle(request,id):
 		return redirect("/Vehicle")
 	return render(request,'edit_vehicle.html', {'title':'Update Vehicle Details', 'form':form, 'vehicle':vehicle})
 			
+@login_required(login_url='/login')
 def delete_vehicle(request,id):
 	vehicle = Vehicle.objects.get(id=id)
 	vehicle.delete()
 	return redirect("/Vehicle")
 
+@login_required(login_url='/login')
 def vehicle(request):
 	form = VehicleForm()
 	if request.method=='POST':
@@ -236,15 +252,18 @@ def vehicle(request):
 
 #################### Bank Detail ####################################### 
 
+@login_required(login_url='/login')
 def show_bank_detail(request):
 	bank_detail = Bank_detail.objects.all()
 	return render(request, 'show_bank_detail.html', {'title':'Bank Detail', 'bank_detail':bank_detail })
 
+@login_required(login_url='/login')
 def edit_bank_detail(request,id):
 	bank_detail = Bank_detail.objects.get(id=id) 
 	form = Bank_detailForm(instance=bank_detail) 
 	return render(request,'edit_bank_detail.html', {'title':'Update Bank Details', 'form':form, 'bank_detail':bank_detail})
 
+@login_required(login_url='/login')
 def update_bank_detail(request,id):
 	bank_detail = Bank_detail.objects.get(id=id)
 	form = Bank_detailForm(request.POST, instance=bank_detail)
@@ -254,11 +273,13 @@ def update_bank_detail(request,id):
 		return redirect("/Bank Detail")
 	return render(request,'edit_bank_detail.html', {'title':'Update Bank Details', 'form':form, 'bank_detail':bank_detail})
 			
+@login_required(login_url='/login')
 def delete_bank_detail(request,id):
 	bank_detail = Bank_detail.objects.get(id=id)
 	bank_detail.delete()
 	return redirect("/Bank Detail")
 
+@login_required(login_url='/login')
 def bank_detail(request):
 	form = Bank_detailForm()
 	if request.method=='POST':
@@ -273,15 +294,18 @@ def bank_detail(request):
 
 ################ Client ################################################### 
 
+@login_required(login_url='/login')
 def show_client(request):
 	client = Client.objects.all()
 	return render(request, 'show_client.html', {'title':'Client', 'client':client })
 
+@login_required(login_url='/login')
 def edit_client(request,id):
 	client = Client.objects.get(id=id) 
 	form = ClientForm(instance=client) 
 	return render(request,'edit_client.html', {'title':'Update Client', 'form':form, 'client':client})
 
+@login_required(login_url='/login')
 def update_client(request,id):
 	client = Client.objects.get(id=id)
 	form = ClientForm(request.POST, instance=client)
@@ -291,11 +315,13 @@ def update_client(request,id):
 		return redirect("/Client")
 	return render(request,'edit_client.html', {'title':'Update client', 'form':form, 'client':client})
 			
+@login_required(login_url='/login')
 def delete_client(request,id):
 	client = Client.objects.get(id=id)
 	client.delete()
 	return redirect("/Client")
 
+@login_required(login_url='/login')
 def client(request):
 	form = ClientForm()
 	if request.method=='POST':
@@ -319,7 +345,7 @@ def Login(request):
 		if user is not None:
 			form = login(request, user)
 			messages.success(request, f' welcome {username} !!') 
-			return redirect('/Home/', {'title':'Home'})
+			return redirect(request.POST.get('next'))
 		else: 
 			messages.info(request, f'account does not exit plz sign up') 
 	return render(request, 'login.html', {'title':'log in', 'form':form})
@@ -327,16 +353,19 @@ def Login(request):
 
 ################ Notifications ################################################### 
 
+@login_required(login_url='/login')
 def PUC_notifications(request):
 	check_expiry_PUC()
 	PUC = Vehicle.objects.filter(PUC_expired=True)
 	return render(request,'PUC_notifications.html',{'title':'Notifications', 'PUC':PUC})
 
+@login_required(login_url='/login')
 def license_notifications(request):
 	check_expiry_license()
 	license = Driver.objects.filter(License_expired=True)
 	return render(request,'license_notifications.html',{'title':'Notifications', 'license':license})
 
+@login_required(login_url='/login')
 def insurance_notifications(request):
 	check_expiry_insurance()
 	insurance = Vehicle.objects.filter(Insurance_expired=True)

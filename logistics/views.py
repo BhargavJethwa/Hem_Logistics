@@ -1,10 +1,10 @@
-from logistics.forms import DriverForm,Trip_detailForm, VehicleForm,Bank_detailForm,ClientForm
+from logistics.forms import DriverForm, TransactionForm,Trip_detailForm, VehicleForm,Bank_detailForm,ClientForm
 from django.shortcuts import render, redirect 
 from django.contrib.auth import authenticate, login 
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
-from .models import Bank_detail, Driver,Vehicle,Trip_detail,Client
+from .models import Bank_detail, Driver, Transaction,Vehicle,Trip_detail,Client
 from .helper_functions import check_expiry_insurance,check_expiry_license,check_expiry_PUC
 from django.http import JsonResponse
 from django.core import serializers
@@ -85,6 +85,7 @@ def update_trip_detail(request,id):
 	trip = Trip_detail.objects.get(id=id)
 	form = Trip_detailForm(request.POST, instance=trip)
 	if form.is_valid():
+		transaction=Transaction.objects.get(Trip_detail=trip)
 		trip.Client=Client.objects.get(id=request.POST.get('Client'))
 		trip.Driver=Driver.objects.get(id=request.POST.get('Driver'))
 		trip.Vehicle=Vehicle.objects.get(id=request.POST.get('Vehicle'))
@@ -97,7 +98,12 @@ def update_trip_detail(request,id):
 		else:
 			trip.Rate=0
 		trip.Freight=request.POST.get('Freight')
+
+		vehicle=Vehicle.objects.get(id=request.POST.get('Vehicle'))
+		vehicle.balance=vehicle.balance-trip.Advance_payment
 		trip.Advance_payment=request.POST.get('Advance_payment')
+		vehicle.balance=vehicle.balance+trip.Advance_payment
+		transaction.Amount=trip.Advance_payment
 		trip.Source=request.POST.get('Source')
 		i=1
 		Destination=[]
@@ -114,8 +120,10 @@ def update_trip_detail(request,id):
 		trip.Load_unload_charges=json.dumps(load_unload_charges)
 		trip.Other_charges=json.dumps(other_charges)
 		trip.Total_payment = total_payment
-		
-		trip.save()			
+	
+		trip.save()				
+		transaction.save()
+		vehicle.save()
 		messages.success(request, 'Updated successfully!!!')
 		return redirect("/Trip Detail")
 	return render(request,'edit_trip_detail.html', {'title':'Update Trip Details', 'form':form,'trip_detail':trip})
@@ -123,6 +131,12 @@ def update_trip_detail(request,id):
 @login_required(login_url='/login')
 def delete_trip_detail(request,id):
 	trip_detail = Trip_detail.objects.get(id=id)
+	vehicle=trip_detail.Vehicle
+	transaction=Transaction.objects.get(Trip_detail=trip_detail)
+
+	vehicle.Balance=vehicle.Balance-int(trip_detail.Advance_payment)+int(trip_detail.Total_payment)
+	vehicle.save()
+	transaction.delete()
 	trip_detail.delete()
 	return redirect("/Trip Detail")
 
@@ -171,8 +185,22 @@ def trip_detail(request):
 			trip.Load_unload_charges=json.dumps(load_unload_charges)
 			trip.Other_charges=json.dumps(other_charges)
 			trip.Total_payment = total_payment
+				
+
+			transaction=Transaction()
+			transaction.Trip_detail=trip
+			transaction.Vehicle=trip.Vehicle
+			transaction.Bank_detail=trip.Bank_detail
+			transaction.Amount=trip.Advance_payment
+			transaction.Is_advance=True
 			
-			trip.save()			
+			vehicle=Vehicle.objects.get(id=request.POST.get('Vehicle'))
+			vehicle.Balance = vehicle.Balance+int(trip.Advance_payment)-int(trip.Total_payment)
+
+			trip.save()
+			transaction.save()
+			vehicle.save()
+
 			messages.success(request, 'Added successfully!!!')
 			form = Trip_detailForm()
 			return redirect("/Trip Detail")
@@ -313,7 +341,7 @@ def update_client(request,id):
 		form.save()
 		messages.success(request, 'Updated successfully!!!')
 		return redirect("/Client")
-	return render(request,'edit_client.html', {'title':'Update client', 'form':form, 'client':client})
+	return render(request,'edit_client.html', {'title':'Update Client', 'form':form, 'client':client})
 			
 @login_required(login_url='/login')
 def delete_client(request,id):
@@ -333,6 +361,64 @@ def client(request):
 			return redirect("/Client")
 
 	return render(request, 'client.html', {'form': form, 'title':'Add Client'})
+
+
+################ Transaction ################################################### 
+
+@login_required(login_url='/login')
+def show_transaction(request):
+	transaction = Transaction.objects.all()
+	return render(request, 'show_transaction.html', {'title':'Transaction', 'transaction':transaction })
+
+@login_required(login_url='/login')
+def edit_transaction(request,id):
+	transaction = Transaction.objects.get(id=id) 
+	form = TransactionForm(instance=transaction) 
+	return render(request,'edit_transaction.html', {'title':'Update Transaction', 'form':form, 'transaction':transaction})
+
+@login_required(login_url='/login')
+def update_transaction(request,id):
+	transaction = TransactionForm.objects.get(id=id)
+	vehicle=transaction.Vehicle
+	form = TransactionForm(request.POST, instance=transaction)
+	if form.is_valid():
+		vehicle.Balance = vehicle.Balance-int(transaction.Amount)
+		
+		form.save()
+		
+		vehicle.Balance = vehicle.Balance+int(request.POST.get('Amount'))
+		vehicle.save()
+
+		messages.success(request, 'Updated successfully!!!')
+		return redirect("/Transaction")
+	return render(request,'edit_transaction.html', {'title':'Update Transaction', 'form':form, 'transaction':transaction})
+			
+@login_required(login_url='/login')
+def delete_transaction(request,id):
+	transaction = Transaction.objects.get(id=id)
+	
+	vehicle=transaction.Vehicle
+	vehicle.balance = vehicle.balance-transaction.Amount
+	vehicle.save()
+	
+	transaction.delete()
+	return redirect("/Transaction")
+
+@login_required(login_url='/login')
+def transaction(request):
+	form = TransactionForm()
+	if request.method=='POST':
+		form = TransactionForm(request.POST)
+		if form.is_valid():
+			form.save()
+			vehicle=Vehicle.objects.get(id=request.POST.get('Vehicle'))
+			vehicle.Balance = vehicle.Balance+int(request.POST.get('Amount'))
+			vehicle.save()
+			messages.success(request, 'Added successfully!!!')
+			form = TransactionForm()
+			return redirect("/Transaction")
+
+	return render(request, 'transaction.html', {'form': form, 'title':'Add Transaction'})
 
 ################ login forms ################################################### 
 

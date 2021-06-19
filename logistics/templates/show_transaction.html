@@ -1,0 +1,54 @@
+{% extends "index.html" %}
+{% load crispy_forms_tags %}
+{% block start %}
+
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
+  
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
+<script>
+  $(document).ready( function () {
+    $('#table').DataTable();
+  } );
+</script>
+
+<h1 style="text-align: center; padding-top: 20px;"> Transaction details</h1>
+</br>
+
+<table id="table" class="table table-striped" style="overflow-y: scroll; height: 1px;">  
+    <thead class="thead-dark">  
+    <tr>  
+        <th>Date</th>  
+        <!-- <th>Trip</th>   -->
+        <th>RC Number</th>  
+        <th>Bank Detail</th>  
+        <th>Amount</th>  
+        <th>Actions</th>  
+    </tr>  
+    </thead>  
+    <tbody>  
+{% for x in transaction %}  
+    <tr>  
+        <td>{{ x.Date_created }}</td>  
+        <!-- <td>{{ x.Trip_detail }}</td>   -->
+        <td>{{ x.Vehicle }}</td>  
+        <td>{{ x.Bank_detail }}</td>  
+        <td>{{ x.Amount }}</td>  
+        <td id = "{{x.id}}_action">  
+            <a href="/edit_transaction/{{ x.id }}"><span class="glyphicon glyphicon-pencil" > </span></a>
+            <a href="/delete_transaction/{{ x.id }}"><span class="glyphicon glyphicon-remove" style="margin-left: 10px;" > </span></a>
+        </td> 
+    </tr>  
+{% endfor %}  
+    </tbody>  
+</table>  
+
+{% if user.is_authenticated %}
+<center><a href="/Add Transaction/" class="btn btn-primary">Add New Record</a></center>
+{% endif %} 
+{% for x in transaction %}
+    <script>
+        if("{{x.Is_advance}}"=="True")
+            $('#{{x.id}}_action').empty();
+    </script>
+{% endfor %}
+{% endblock start %}

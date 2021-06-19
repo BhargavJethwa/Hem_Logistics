@@ -45,8 +45,8 @@
         </td>  
         {% if user.is_authenticated %}
         <td>  
-            <dt><a href="/edit_driver/{{ x.id }}"><span class="glyphicon glyphicon-pencil" >Edit</span></a></dt>
-            <dt><a href="/delete_driver/{{ x.id }}"><span class="glyphicon glyphicon-remove">Delete</span></a></dt>
+            <a href="/edit_driver/{{ x.id }}"><span class="glyphicon glyphicon-pencil" > </span></a>
+            <a href="/delete_driver/{{ x.id }}"><span class="glyphicon glyphicon-remove"> </span></a>
         </td> 
         {% endif %} 
     </tr>  
@@ -57,29 +57,6 @@
 {% if user.is_authenticated %}
 <center><a href="/Add Driver/" class="btn btn-primary">Add New Record</a></center>
 {% endif %} 
-
-<div class= "modal_container" id="vehicle_modal_container">
-    <div class="modalll" style="top:15%;">
-      <div>
-        <p id=Owner></p>
-        <p id=RC_number></p>
-        <p id=PAN_number></p>
-        <p id=Type></p>
-        <p id=Other></p>
-        <p id=Insurance_policy_number></p>
-        <p id=Insurance_expiry_date></p>
-        <p id=PUC_expiry_date></p>
-        <p id=Safety_equipments></p>
-        <p id=GPS></p>
-        <p id=Contact_number></p>
-        <hr style="height:2px;border-width:0;color:gray;background-color:gray">
-        <center>
-            <button id=close style="padding: 5px;" class="btn btn-primary">Close me</button>
-        </center>
-      </div>
-
-    </div>
-</div>
 
 <br />  
 <br />  
@@ -110,11 +87,6 @@
         </script>
     {% endfor %}
 {% endfor %}
-<script>
-    document.getElementById('close').addEventListener('click',()=>{
-        document.getElementById('vehicle_modal_container').classList.remove('show');
-        // $('#table').parents('div.dataTables_wrapper').first().show();
-    });
-</script>
+
 
 {% endblock start %}

@@ -17,15 +17,17 @@
 <table id="table" class="table table-striped" style="overflow-y: scroll; height: 1px;">  
     <thead class="thead-dark">  
     <tr>  
+        <th>Date</th>  
         <th>Client</th>  
         <th>RC Number</th>  
         <th>Driver</th>  
         <!-- <th>Trip ID</th>   -->
         <th>Path</th>
         <th>Rate</th>
-        <th>Distance(Km)</th>
+        <th>Distance</th>
+        <th>Freight</th>
         <th>U/L</th>
-        <th>Other Charges</th>
+        <th>Other</th>
         <th>Advance</th>
         <th>Total</th>
         {% if user.is_authenticated %} 
@@ -36,6 +38,7 @@
     <tbody>  
 {% for x in trip_detail %}  
     <tr>  
+        <td>{{ x.Date_created }}</td>  
         <td>{{ x.Client }}</td>  
         <td >
             <button class="astext" id = {{x.id}}{{x.Vehicle.id}}>{{ x.Vehicle }}</button>
@@ -48,7 +51,8 @@
             <dt style="font-weight: normal;">{{ x.Source }}</dt>
         </td>
         <td id="{{x.id}}_Rate"></td>
-        <td>{{x.Distance}}</td>
+        <td>{{x.Distance}} Km</td>
+        <td>{{x.Freight}}</td>
         <td id = "{{x.id}}_LU">
             <dt></dt>
         </td>
@@ -59,8 +63,8 @@
         <td>{{ x.Total_payment }}</td>
         {% if user.is_authenticated %}
         <td id="{{x.id}}_action">  
-            <dt><a href="/edit_trip_detail/{{ x.id }}"><span class="glyphicon glyphicon-pencil" >Edit</span></a></dt>
-            <dt><a href="/delete_trip_detail/{{ x.id }}" class="confirm-delete"><span class="glyphicon glyphicon-remove" >Delete</span></a></dt>
+            <a href="/edit_trip_detail/{{ x.id }}"><span class="glyphicon glyphicon-pencil" > </span></a>
+            <a href="/delete_trip_detail/{{ x.id }}" class="confirm-delete"><span class="glyphicon glyphicon-remove" > </span></a>
             
         </td> 
         {% endif %} 
@@ -91,49 +95,11 @@
         for(var i in Other_charges)
             $('#{{x.id}}_other').append("<dt style='font-weight: normal;'>"+Other_charges[i]+"</dt>");
         if("{{x.Finished}}"=="False")
-            $("#{{x.id}}_action").append("<dt><a href='/finish_trip_detail/{{ x.id }}' class='confirm-finish'><span class='glyphicon glyphicon-ok' >Finish</span></a></dt>");
+            $("#{{x.id}}_action").append("<a href='/finish_trip_detail/{{ x.id }}' class='confirm-finish'><span class='glyphicon glyphicon-ok' ></span></a>");
     </script>
 {% endfor %}
 
-<div class= "modal_container" id="vehicle_modal_container">
-    <div class="modalll" style="top:15%;">
-      <div>
-        <p id=Owner></p>
-        <p id=RC_number></p>
-        <p id=PAN_number></p>
-        <p id=Type></p>
-        <p id=Other></p>
-        <p id=Insurance_policy_number></p>
-        <p id=Insurance_expiry_date></p>
-        <p id=PUC_expiry_date></p>
-        <p id=Safety_equipments></p>
-        <p id=GPS></p>
-        <p id=Contact_number></p>
-        <hr style="height:2px;border-width:0;color:gray;background-color:gray">
-        <center>
-            <button id=close_vehicle style="padding: 5px;" class="btn btn-primary">Close me</button>
-        </center>
-      </div>
 
-    </div>
-</div>
-
-<div class= "modal_container" id="driver_modal_container">
-    <div class="modalll" style="top:25%;">
-      <div>
-        <p id=Name></p>
-        <p id=License_number></p>
-        <p id=License_expiry></p>
-        <p id=Contact_number></p>
-        <!-- <p id=Vehicle></p> -->
-        <hr style="height:2px;border-width:0;color:gray;background-color:gray">
-        <center>
-            <button id=close_driver style="padding: 5px;" class="btn btn-primary">Close me</button>
-        </center>
-      </div>
-
-    </div>
-</div>
 
 <br />  
 <br />  
@@ -169,15 +135,6 @@
         });
     </script>
 {% endfor %}
-<script>
-    document.getElementById('close_vehicle').addEventListener('click',()=>{
-        document.getElementById('vehicle_modal_container').classList.remove('show');
-    });
-    document.getElementById('close_driver').addEventListener('click',()=>{
-        document.getElementById('driver_modal_container').classList.remove('show');
-    });
-</script>
-
 
 <script>
     $(document).on('click', '.confirm-delete', function(){

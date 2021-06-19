@@ -73,6 +73,7 @@
                 <li><a class="dropdown-item" href="/Add Client">Client</a></li>
                 <li><a class="dropdown-item" href="/Add Trip Detail">Trip Detail</a></li>
                 <li><a class="dropdown-item" href="/Add Bank Detail">Bank Detail</a></li>
+                <li><a class="dropdown-item" href="/Add Transaction">Transcation</a></li>
               </ul>
             </li>
             <!-- <li><a href="/Notifications">Notifications</a></li> -->
@@ -159,10 +160,60 @@
           </a>
         </div>
       </div>
+      <div class="column1">
+        <div class="card">
+          <a href="/Transaction">
+            <!-- <img src="{% static  'images/vehicle1.png' %}" alt="Bank Detail"> -->
+            <div class="content valign-wrapper" style="padding: 1px; text-align: center;">
+              <h4><b> Transaction </b></h4> 
+            </div>
+          </a>
+        </div>
+      </div>
     </div>
     
    
     {% endblock %}
+
+    <div class= "modal_container" id="vehicle_modal_container">
+      <div class="modalll" style="top:15%;">
+        <div>
+          <p id=Owner></p>
+          <p id=RC_number></p>
+          <p id=PAN_number></p>
+          <p id=Type></p>
+          <p id=Other></p>
+          <p id=Insurance_policy_number></p>
+          <p id=Insurance_expiry_date></p>
+          <p id=PUC_expiry_date></p>
+          <p id=Safety_equipments></p>
+          <p id=GPS></p>
+          <p id=Contact_number></p>
+          <hr style="height:2px;border-width:0;color:gray;background-color:gray">
+          <center>
+              <button id=close_vehicle style="padding: 5px;" class="btn btn-primary">Close me</button>
+          </center>
+        </div>
+  
+      </div>
+  </div>
+  
+  <div class= "modal_container" id="driver_modal_container">
+      <div class="modalll" style="top:25%;">
+        <div>
+          <p id=Name></p>
+          <p id=License_number></p>
+          <p id=License_expiry></p>
+          <p id=Contact_number></p>
+          <!-- <p id=Vehicle></p> -->
+          <hr style="height:2px;border-width:0;color:gray;background-color:gray">
+          <center>
+              <button id=close_driver style="padding: 5px;" class="btn btn-primary">Close me</button>
+          </center>
+        </div>
+  
+      </div>
+  </div>
   <br />
   <br />
 </body>
@@ -173,6 +224,15 @@
       $('#msg').remove();
   },2000);
   
+</script>
+
+<script>
+  document.getElementById('close_vehicle').addEventListener('click',()=>{
+      document.getElementById('vehicle_modal_container').classList.remove('show');
+  });
+  document.getElementById('close_driver').addEventListener('click',()=>{
+      document.getElementById('driver_modal_container').classList.remove('show');
+  });
 </script>
 
 </html>

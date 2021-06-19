@@ -1,3 +1,4 @@
+from django.db.models.fields import DateField
 from django.utils.timezone import now
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -37,6 +38,7 @@ class Vehicle(models.Model):
     Insurance_expired = models.BooleanField(default=False)
     PUC_expired = models.BooleanField(default=False)
     Available = models.BooleanField(default=True)
+    Balance = models.IntegerField(default=0)
 
     def save(self, *args, **kwargs):
         if(self.Other):
@@ -119,4 +121,31 @@ class Bank_detail(models.Model):
     
     def __str__(self):
         return self.Account_number
+        
+class Transaction(models.Model):
+    Trip_detail = models.ForeignKey(
+        'Trip_detail',
+        on_delete=models.RESTRICT,
+        verbose_name="Trip",
+        blank=True,
+        null=True,
+    )
+    Vehicle = models.ForeignKey(
+        'Vehicle',
+        on_delete=models.RESTRICT,
+        verbose_name="RC Number",
+    )
+    
+    Bank_detail = models.ForeignKey(
+        'Bank_detail',
+        on_delete=models.RESTRICT,
+        verbose_name="Bank Detail",
+    )
+
+    Date_created = models.DateField(default=now)
+    Amount = models.IntegerField()
+    Is_advance = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return self.id
         

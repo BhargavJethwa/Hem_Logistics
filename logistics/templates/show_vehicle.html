@@ -28,6 +28,7 @@
         <th>PUC Expiry Date</th>
         <th>Safety Equipments</th>
         <th>GPS</th>
+        <th>Balance</th>
         <th>Contact Number</th> 
         {% if user.is_authenticated %} 
         <th>Actions</th>  
@@ -47,11 +48,12 @@
         <td>{{ x.PUC_expiry_date }}</td>
         <td>{{ x.Safety_equipments }}</td>  
         <td>{{ x.GPS }}</td>  
+        <td>{{ x.Balance }}</td>  
         <td>{{ x.Contact_number }}</td>  
         {% if user.is_authenticated %}
         <td>  
-            <dt><a href="/edit_vehicle/{{ x.id }}"><span class="glyphicon glyphicon-pencil" > Edit</span></a></dt>
-            <dt><a href="/delete_vehicle/{{ x.id }}"><span class="glyphicon glyphicon-remove" > Delete</span></a></dt>
+            <a href="/edit_vehicle/{{ x.id }}"><span class="glyphicon glyphicon-pencil" > </span></a>
+            <a href="/delete_vehicle/{{ x.id }}"><span class="glyphicon glyphicon-remove" > </span></a>
         </td> 
         {% endif %} 
     </tr>  

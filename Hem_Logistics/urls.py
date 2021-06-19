@@ -59,6 +59,12 @@ urlpatterns = [
     path('edit_client/<int:id>', logistics_view.edit_client, name='edit_client'),
     path('delete_client/<int:id>', logistics_view.delete_client, name='delete_client'),
 
+    path('Add Transaction/', logistics_view.transaction, name='transaction'), 
+    path('Transaction/', logistics_view.show_transaction, name='show_transaction'),
+    path('update_transaction/<int:id>', logistics_view.update_transaction, name='update_transaction'),
+    path('edit_transaction/<int:id>', logistics_view.edit_transaction, name='edit_transaction'),
+    path('delete_transaction/<int:id>', logistics_view.delete_transaction, name='delete_transaction'),
+
     path('PUC_Notifications/', logistics_view.PUC_notifications, name ='PUC_Notifications'), 
     path('License_Notifications/', logistics_view.license_notifications, name ='License_Notifications'), 
     path('Insurance_Notifications/', logistics_view.insurance_notifications, name ='Insurance_Notifications'), 

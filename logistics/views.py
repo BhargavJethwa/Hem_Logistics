@@ -193,6 +193,7 @@ def trip_detail(request):
 			transaction.Bank_detail=trip.Bank_detail
 			transaction.Amount=trip.Advance_payment
 			transaction.Is_advance=True
+			transaction.Details="Advance"
 			
 			vehicle=Vehicle.objects.get(id=request.POST.get('Vehicle'))
 			vehicle.Balance = vehicle.Balance+int(trip.Advance_payment)-int(trip.Total_payment)
@@ -443,16 +444,16 @@ def Login(request):
 def PUC_notifications(request):
 	check_expiry_PUC()
 	PUC = Vehicle.objects.filter(PUC_expired=True)
-	return render(request,'PUC_notifications.html',{'title':'Notifications', 'PUC':PUC})
+	return render(request,'PUC_notifications.html',{'title':'PUC', 'PUC':PUC})
 
 @login_required(login_url='/login')
 def license_notifications(request):
 	check_expiry_license()
 	license = Driver.objects.filter(License_expired=True)
-	return render(request,'license_notifications.html',{'title':'Notifications', 'license':license})
+	return render(request,'license_notifications.html',{'title':'License', 'license':license})
 
 @login_required(login_url='/login')
 def insurance_notifications(request):
 	check_expiry_insurance()
 	insurance = Vehicle.objects.filter(Insurance_expired=True)
-	return render(request,'insurance_notifications.html',{'title':'Notifications', 'insurance':insurance})
+	return render(request,'insurance_notifications.html',{'title':'Insurance', 'insurance':insurance})

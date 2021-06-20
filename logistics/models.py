@@ -144,6 +144,7 @@ class Transaction(models.Model):
 
     Date_created = models.DateField(default=now)
     Amount = models.IntegerField()
+    Details = models.CharField(max_length=50)
     Is_advance = models.BooleanField(default=False)
     
     def __str__(self):

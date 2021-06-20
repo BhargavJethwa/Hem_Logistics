@@ -5,8 +5,9 @@ def check_expiry_PUC():
     vehicles = Vehicle.objects.all()
 
     for vehicle in vehicles:
-        if (vehicle.PUC_expiry_date - now().date())<timedelta(days=15):
-            vehicle.PUC_expired=True
+        if(vehicle.Notifications):
+            if (vehicle.PUC_expiry_date - now().date())<timedelta(days=15):
+                vehicle.PUC_expired=True
         else:
             vehicle.PUC_expired=False
         
@@ -16,8 +17,9 @@ def check_expiry_insurance():
     vehicles = Vehicle.objects.all()
    
     for vehicle in vehicles:
-        if (vehicle.Insurance_expiry_date - now().date())<timedelta(days=15):
-            vehicle.Insurance_expired=True
+        if(vehicle.Notifications):
+            if (vehicle.Insurance_expiry_date - now().date())<timedelta(days=15):
+                vehicle.Insurance_expired=True
         else:
             vehicle.Insurance_expired=False
         vehicle.save()

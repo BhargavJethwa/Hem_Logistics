@@ -22,6 +22,7 @@
         <th>RC Number</th>  
         <th>Bank Detail</th>  
         <th>Amount</th>  
+        <th>Detail</th>  
         <th>Actions</th>  
     </tr>  
     </thead>  
@@ -33,6 +34,7 @@
         <td>{{ x.Vehicle }}</td>  
         <td>{{ x.Bank_detail }}</td>  
         <td>{{ x.Amount }}</td>  
+        <td>{{ x.Details }}</td>  
         <td id = "{{x.id}}_action">  
             <a href="/edit_transaction/{{ x.id }}"><span class="glyphicon glyphicon-pencil" > </span></a>
             <a href="/delete_transaction/{{ x.id }}"><span class="glyphicon glyphicon-remove" style="margin-left: 10px;" > </span></a>

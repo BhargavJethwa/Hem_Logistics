@@ -379,15 +379,17 @@ def edit_transaction(request,id):
 
 @login_required(login_url='/login')
 def update_transaction(request,id):
-	transaction = TransactionForm.objects.get(id=id)
+	transaction = Transaction.objects.get(id=id)
+	balance = transaction.Amount
 	vehicle=transaction.Vehicle
 	form = TransactionForm(request.POST, instance=transaction)
 	if form.is_valid():
-		vehicle.Balance = vehicle.Balance-int(transaction.Amount)
-		
+		vehicle.Balance = vehicle.Balance-int(balance)
+		print(vehicle.Balance)
 		form.save()
 		
 		vehicle.Balance = vehicle.Balance+int(request.POST.get('Amount'))
+		print(vehicle.Balance)
 		vehicle.save()
 
 		messages.success(request, 'Updated successfully!!!')

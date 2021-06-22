@@ -51,7 +51,10 @@ def update_driver(request,id):
 @login_required(login_url='/login')
 def delete_driver(request,id):
 	driver = Driver.objects.get(id=id)
-	driver.delete()
+	try:
+		driver.delete()
+	except:
+		messages.warning(request, 'Cannot be deleted!!! Please contact Admin')		
 	return redirect("/Driver")
 
 @login_required(login_url='/login')
@@ -83,6 +86,7 @@ def edit_trip_detail(request,id):
 @login_required(login_url='/login')
 def update_trip_detail(request,id):
 	trip = Trip_detail.objects.get(id=id)
+	balance=int(trip.Advance_payment)
 	form = Trip_detailForm(request.POST, instance=trip)
 	if form.is_valid():
 		transaction=Transaction.objects.get(Trip_detail=trip)
@@ -95,14 +99,14 @@ def update_trip_detail(request,id):
 		trip.Distance=request.POST.get('Distance')
 		if request.POST.get('Rate') != '':
 			trip.Rate=request.POST.get('Rate')
+			trip.Freight=int(trip.Distance)*int(trip.Rate)
 		else:
 			trip.Rate=0
-		trip.Freight=request.POST.get('Freight')
+			trip.Freight=request.POST.get('Freight')
 
 		vehicle=Vehicle.objects.get(id=request.POST.get('Vehicle'))
-		vehicle.balance=vehicle.balance-trip.Advance_payment
 		trip.Advance_payment=request.POST.get('Advance_payment')
-		vehicle.balance=vehicle.balance+trip.Advance_payment
+		vehicle.Balance=vehicle.Balance+int(trip.Advance_payment)-balance
 		transaction.Amount=trip.Advance_payment
 		trip.Source=request.POST.get('Source')
 		i=1
@@ -121,6 +125,10 @@ def update_trip_detail(request,id):
 		trip.Other_charges=json.dumps(other_charges)
 		trip.Total_payment = total_payment
 	
+		if(trip.Total_payment<int(trip.Advance_payment)):
+				messages.warning(request, 'Advance cannot be greater than Total amount!!!')
+				return render(request,'edit_trip_detail.html', {'title':'Update Trip Details', 'form':form,'trip_detail':trip})
+
 		trip.save()				
 		transaction.save()
 		vehicle.save()
@@ -136,8 +144,11 @@ def delete_trip_detail(request,id):
 
 	vehicle.Balance=vehicle.Balance-int(trip_detail.Advance_payment)+int(trip_detail.Total_payment)
 	vehicle.save()
-	transaction.delete()
-	trip_detail.delete()
+	try:
+		transaction.delete()
+		trip_detail.delete()
+	except:
+		messages.warning(request, 'Cannot be deleted!!! Please contact Admin')	
 	return redirect("/Trip Detail")
 
 @login_required(login_url='/login')
@@ -165,9 +176,10 @@ def trip_detail(request):
 			trip.Distance=request.POST.get('Distance')
 			if request.POST.get('Rate') != '':
 				trip.Rate=request.POST.get('Rate')
+				trip.Freight=int(trip.Distance)*int(trip.Rate)
 			else:
 				trip.Rate=0
-			trip.Freight=request.POST.get('Freight')
+				trip.Freight=request.POST.get('Freight')
 			trip.Advance_payment=request.POST.get('Advance_payment')
 			trip.Source=request.POST.get('Source')
 			i=1
@@ -185,6 +197,10 @@ def trip_detail(request):
 			trip.Load_unload_charges=json.dumps(load_unload_charges)
 			trip.Other_charges=json.dumps(other_charges)
 			trip.Total_payment = total_payment
+				
+			if(trip.Total_payment<int(trip.Advance_payment)):
+				messages.warning(request, 'Advance cannot be greater than Total amount!!!')
+				return render(request, 'trip_detail.html', {'form': form, 'title':'Add Trip Detail'})
 				
 
 			transaction=Transaction()
@@ -263,7 +279,10 @@ def update_vehicle(request,id):
 @login_required(login_url='/login')
 def delete_vehicle(request,id):
 	vehicle = Vehicle.objects.get(id=id)
-	vehicle.delete()
+	try:
+		vehicle.delete()
+	except:
+		messages.warning(request, 'Cannot be deleted!!! Please contact Admin')
 	return redirect("/Vehicle")
 
 @login_required(login_url='/login')
@@ -305,7 +324,10 @@ def update_bank_detail(request,id):
 @login_required(login_url='/login')
 def delete_bank_detail(request,id):
 	bank_detail = Bank_detail.objects.get(id=id)
-	bank_detail.delete()
+	try:
+		bank_detail.delete()
+	except:
+		messages.warning(request, 'Cannot be deleted!!! Please contact Admin')		
 	return redirect("/Bank Detail")
 
 @login_required(login_url='/login')
@@ -347,7 +369,10 @@ def update_client(request,id):
 @login_required(login_url='/login')
 def delete_client(request,id):
 	client = Client.objects.get(id=id)
-	client.delete()
+	try:
+		client.delete()
+	except:
+		messages.warning(request, 'Cannot be deleted!!! Please contact Admin')
 	return redirect("/Client")
 
 @login_required(login_url='/login')
@@ -384,12 +409,9 @@ def update_transaction(request,id):
 	vehicle=transaction.Vehicle
 	form = TransactionForm(request.POST, instance=transaction)
 	if form.is_valid():
-		vehicle.Balance = vehicle.Balance-int(balance)
-		print(vehicle.Balance)
 		form.save()
 		
-		vehicle.Balance = vehicle.Balance+int(request.POST.get('Amount'))
-		print(vehicle.Balance)
+		vehicle.Balance = vehicle.Balance+int(request.POST.get('Amount'))-int(balance)
 		vehicle.save()
 
 		messages.success(request, 'Updated successfully!!!')
@@ -401,10 +423,13 @@ def delete_transaction(request,id):
 	transaction = Transaction.objects.get(id=id)
 	
 	vehicle=transaction.Vehicle
-	vehicle.balance = vehicle.balance-transaction.Amount
+	vehicle.Balance = vehicle.Balance-int(transaction.Amount)
 	vehicle.save()
 	
-	transaction.delete()
+	try:
+		transaction.delete()
+	except:
+		messages.warning(request, 'Cannot be deleted!!! Please contact Admin')
 	return redirect("/Transaction")
 
 @login_required(login_url='/login')

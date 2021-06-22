@@ -12,29 +12,39 @@
         $('#id_Vehicle').empty();
 
 
-        $("#id_Rate_type").change(function() {
+        $("#id_Rate_type").on("change",function() {
             if($(this).val() == "VARIABLE"){
-                $("#id_Rate").show();
-                $("#id_Freight").attr("disabled","");
-                $("label[for='id_Rate']").text("Rate: ");
+                $("#id_Freight").attr("onfocus","blur()");
+                $("#id_Freight").attr("type","text");
                 $('#id_Freight').val("");
-                $("#id_Distance").keyup(function(){
+                $("#id_Rate").attr("required","");
+                $("#id_Rate").show();
+                $("label[for='id_Rate']").text("Rate: ");
+                $('#id_Rate').val("8");
+
+                if($('#id_Distance').val()!="")
+                    $('#id_Freight').val($('#id_Rate').val()*$('#id_Distance').val());
+
+                $("#id_Distance").on("change",function(){
                     if($('#id_Rate').val()!="")
                         $('#id_Freight').val($('#id_Rate').val()*$('#id_Distance').val());
                 });
-                $("#id_Rate").keyup(function(){
+                $("#id_Rate").on("change",function(){
                     if($('#id_Distance').val()!="")
                         $('#id_Freight').val($('#id_Rate').val()*$('#id_Distance').val());
                 });
             }
             else{
-                $('#id_Freight').val("");
-                $("#id_Rate").hide();
-                $("#id_Freight").removeAttr("disabled");
+                $("#id_Rate").removeAttr("required");
                 $("label[for='id_Rate']").empty();
+                $("#id_Rate").hide();
+                $("#id_Rate").val("");
+                $('#id_Freight').val("");
+                $("#id_Freight").removeAttr("onfocus");
+                $("#id_Freight").attr("type","number");
+                
             }
         });
-        $("#Rate_type").trigger("change");
         
         $i=1;
         $("#add").click(function(e) {

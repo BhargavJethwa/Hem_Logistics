@@ -38,7 +38,7 @@
         {% if user.is_authenticated %}
         <td>  
             <a href="/edit_bank_detail/{{ x.id }}"><span class="glyphicon glyphicon-pencil" > </span></a>
-            <a href="/delete_bank_detail/{{ x.id }}"><span class="glyphicon glyphicon-remove" > </span></a>
+            <a href="/delete_bank_detail/{{ x.id }}" class="confirm-delete"><span class="glyphicon glyphicon-remove" > </span></a>
         </td> 
         {% endif %} 
     </tr>  

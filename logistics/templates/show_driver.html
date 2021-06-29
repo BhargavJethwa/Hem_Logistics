@@ -46,7 +46,7 @@
         {% if user.is_authenticated %}
         <td>  
             <a href="/edit_driver/{{ x.id }}"><span class="glyphicon glyphicon-pencil" > </span></a>
-            <a href="/delete_driver/{{ x.id }}"><span class="glyphicon glyphicon-remove"> </span></a>
+            <a href="/delete_driver/{{ x.id }}" class="confirm-delete"><span class="glyphicon glyphicon-remove"> </span></a>
         </td> 
         {% endif %} 
     </tr>  

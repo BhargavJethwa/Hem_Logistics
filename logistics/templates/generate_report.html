@@ -1,0 +1,124 @@
+{% extends "index.html" %}
+{% load crispy_forms_tags %}
+{% block start %}
+<script>
+    $(document).ready(function (){
+        $("#time_type").attr({"onchange":"type_change()"});
+        $("#date2").hide();
+        $("label[for='date2']").empty();
+        document.getElementById('date1').valueAsDate  =new Date();
+        $("#Vehicle").select2();
+        $('#date1').change(function(){
+            if(Date.parse(new Date()) < Date.parse($(this).val())){
+                document.getElementById('date1').valueAsDate = new Date();
+            }
+        });
+    });
+</script>
+
+<h1 style="text-align: center;padding-top: 20px;"> Generate Report</h1>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4" style="background-color: white; border-radius: 5%; padding: 20pt;margin-top:50pt ">
+            <form method="POST" action='/generate_report' enctype="multipart/form-data">{% csrf_token %}
+                <fieldset class="form-group">
+                    <legend class="border-bottom mb-4">Trip Report</legend>
+                        <div class="form-group">
+                            <label for="time_type">Report Type:</label>
+                            <select name="time_type" id="time_type">
+                                <option value="daily"> Daily</option>
+                                <option value="month"> Monthly</option>
+                                <option value="period"> In Range</option>
+                            </select>
+                            <p><label for="date1">Date: </label><input type="date" name="date1" required id="date1"></p>
+                            <p><label for="date2">Date: </label><input type="date" name="date2" id="date2"></p>
+                            
+                        </div>
+                </fieldset>
+                <div class="form-group">
+                    <!-- <a href="{% url 'generate_report'  %}"> -->
+                        <button class="btn btn-primary" id="trip" type="submit" ><span class="glyphicon glyphicon-download-alt"></span> &nbsp; Generate</button>
+                    <!-- </a> -->
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4" style="background-color: white; border-radius: 5%; padding: 20pt;margin-top:50pt ">
+            <form method="POST" action='/vehicle_report' enctype="multipart/form-data">{% csrf_token %}
+                <fieldset class="form-group">
+                    <legend class="border-bottom mb-4">Vehicle Report</legend>
+                        <div class="form-group">
+                            <label for="Vehicle">Vehicle:</label>
+                            <select name="Vehicle" id="Vehicle">
+                                {% for v in vehicle %}
+                                    <option value="{{ v.id }}"> {{ v.RC_number }}</option>
+                                {% endfor %}
+                            </select>
+                            <p></p>
+                            <p><label for="month">Month: </label><input type="month" name="month" required id="month"></p>
+                            
+                        </div>
+                </fieldset>
+                <div class="form-group">
+                    <!-- <a href="{% url 'generate_report'  %}"> -->
+                        <button class="btn btn-primary" id="trip" type="submit" ><span class="glyphicon glyphicon-download-alt"></span> &nbsp; Generate</button>
+                    <!-- </a> -->
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function type_change(){
+        if($('#time_type').val()=="daily"){
+            $("#date2").hide();
+            $("label[for='date2']").empty();
+            $("#date1").attr("type","date");
+            $("#date2").removeAttr("required");
+            $("label[for='date1']").text("Date: ");
+            document.getElementById('date1').valueAsDate  =new Date();
+            $('#date1').change(function(){
+                if(Date.parse(new Date()) < Date.parse($(this).val())){
+                    document.getElementById('date1').valueAsDate = new Date();
+                }
+            });
+        }
+        if($('#time_type').val()=="month"){
+            $("#date2").hide();
+            $("label[for='date2']").empty();
+            $("label[for='date1']").text("Month: ");
+            $("#date1").attr("type","month");
+            $("#date2").removeAttr("required");
+            $('#date1').change(function(){
+            });
+        }
+        if($('#time_type').val()=="period"){
+            $("#date1").attr("type","date");
+            $("label[for='date1']").text("From:  ");
+            $("#date2").show();
+            $("#date2").attr('required',"");
+            $("label[for='date2']").text("To:  ");
+            document.getElementById('date2').valueAsDate  =new Date();
+            $('#date1').change(function(){
+                if(Date.parse(new Date()) < Date.parse($(this).val())){
+                    document.getElementById('date1').valueAsDate = new Date();
+                }
+            });        
+        }
+    }
+
+    $('#date2').change(function(){
+        if(Date.parse($('#date2').val()) > Date.parse($('#date1').val())){
+            $('#date2').val($('#date1').val());
+        }
+        if(Date.parse(new Date()) < Date.parse($('#date2').val())){
+            document.getElementById('date2').valueAsDate = new Date();
+        }
+    });
+    
+</script>
+
+{% endblock start %}

@@ -37,7 +37,7 @@
         <td>{{ x.Details }}</td>  
         <td id = "{{x.id}}_action">  
             <a href="/edit_transaction/{{ x.id }}"><span class="glyphicon glyphicon-pencil" > </span></a>
-            <a href="/delete_transaction/{{ x.id }}"><span class="glyphicon glyphicon-remove" style="margin-left: 10px;" > </span></a>
+            <a href="/delete_transaction/{{ x.id }}" class="confirm-delete"><span class="glyphicon glyphicon-remove" style="margin-left: 10px;" > </span></a>
         </td> 
     </tr>  
 {% endfor %}  

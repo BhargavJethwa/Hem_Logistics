@@ -5,10 +5,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from .models import Bank_detail, Driver, Transaction,Vehicle,Trip_detail,Client
-from .helper_functions import check_expiry_insurance,check_expiry_license,check_expiry_PUC
-from django.http import JsonResponse
+from .helper_functions import Vehicle_report, check_expiry_insurance,check_expiry_license,check_expiry_PUC,generate_trip_report
+from django.http import JsonResponse,HttpResponse
 from django.core import serializers
-import json
+import json,os,mimetypes
 
 # Create your views here.
 
@@ -484,3 +484,48 @@ def insurance_notifications(request):
 	check_expiry_insurance()
 	insurance = Vehicle.objects.filter(Insurance_expired=True)
 	return render(request,'insurance_notifications.html',{'title':'Insurance', 'insurance':insurance})
+
+################ File Download ################################################### 
+
+@login_required(login_url='/login')
+def report(request):
+	vehicle=Vehicle.objects.all()
+	return render(request,'generate_report.html',{'title':'Generate Report', 'vehicle' : vehicle})
+
+
+################ File Download ################################################### 
+
+@login_required(login_url='/login')
+def generate_report(request):
+	directory = "./"
+	files_in_directory = os.listdir(directory)
+	filtered_files = [file for file in files_in_directory if file.endswith(".xlsx")]
+	for file in filtered_files:
+		path_to_file = os.path.join(directory, file)
+		os.remove(path_to_file)
+	time_type=request.POST.get('time_type')
+	date1=request.POST.get('date1')
+	date2=request.POST.get('date2')
+	name = generate_trip_report(time_type,date1,date2)
+	fl = open(name, 'r',encoding="cp850")
+	mime_type, _ = mimetypes.guess_type(name)
+	response = HttpResponse(fl, content_type=mime_type)
+	response['Content-Disposition'] = "attachment; filename=%s" % name
+	return response
+
+@login_required(login_url='/login')
+def vehicle_report(request):
+	directory = "./"
+	files_in_directory = os.listdir(directory)
+	filtered_files = [file for file in files_in_directory if file.endswith(".xlsx")]
+	for file in filtered_files:
+		path_to_file = os.path.join(directory, file)
+		os.remove(path_to_file)
+	vehicle=request.POST.get('Vehicle')
+	month=request.POST.get('month')
+	name = Vehicle_report(vehicle,month)
+	fl = open(name, 'r',encoding="cp850")
+	mime_type, _ = mimetypes.guess_type(name)
+	response = HttpResponse(fl, content_type=mime_type)
+	response['Content-Disposition'] = "attachment; filename=%s" % name
+	return response

@@ -69,4 +69,8 @@ urlpatterns = [
     path('License_Notifications/', logistics_view.license_notifications, name ='License_Notifications'), 
     path('Insurance_Notifications/', logistics_view.insurance_notifications, name ='Insurance_Notifications'), 
 
+    path('Report/', logistics_view.report, name='report'),
+    path('generate_report', logistics_view.generate_report, name='generate_report'),
+    path('vehicle_report', logistics_view.vehicle_report, name='vehicle_report'),
+
 ]

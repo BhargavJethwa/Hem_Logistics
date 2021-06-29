@@ -32,7 +32,7 @@
         {% if user.is_authenticated %}
         <td>  
             <a href="/edit_client/{{ x.id }}"><span class="glyphicon glyphicon-pencil" > </span></a>
-            <a href="/delete_client/{{ x.id }}"><span class="glyphicon glyphicon-remove" style="margin-left: 10px;" > </span></a>
+            <a href="/delete_client/{{ x.id }}" class="confirm-delete"><span class="glyphicon glyphicon-remove" style="margin-left: 10px;" > </span></a>
         </td> 
         {% endif %} 
     </tr>  

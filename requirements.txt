@@ -16,3 +16,4 @@ six==1.16.0
 sqlparse==0.4.1
 tqdm==4.60.0
 xlrd==2.0.1
+XlsxWriter==1.4.3

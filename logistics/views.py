@@ -507,7 +507,7 @@ def generate_report(request):
 	date1=request.POST.get('date1')
 	date2=request.POST.get('date2')
 	name = generate_trip_report(time_type,date1,date2)
-	fl = open(name, 'r',encoding="cp850")
+	fl = open(name, 'rb')
 	mime_type, _ = mimetypes.guess_type(name)
 	response = HttpResponse(fl, content_type=mime_type)
 	response['Content-Disposition'] = "attachment; filename=%s" % name
@@ -524,7 +524,7 @@ def vehicle_report(request):
 	vehicle=request.POST.get('Vehicle')
 	month=request.POST.get('month')
 	name = Vehicle_report(vehicle,month)
-	fl = open(name, 'r',encoding="cp850")
+	fl = open(name, 'rb')
 	mime_type, _ = mimetypes.guess_type(name)
 	response = HttpResponse(fl, content_type=mime_type)
 	response['Content-Disposition'] = "attachment; filename=%s" % name

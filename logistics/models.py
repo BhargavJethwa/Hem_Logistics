@@ -91,7 +91,7 @@ class Trip_detail(models.Model):
         on_delete=models.RESTRICT,
         verbose_name="Bank Details",
     )
-    Trip_id = models.CharField(max_length=50)
+    Trip_id = models.CharField(max_length=50,unique=True)
     Total_payment = models.IntegerField(validators=[MinValueValidator(0)])
     Rate_type = models.CharField(verbose_name="Rate Type", choices=(('FIX','FIX'),('VARIABLE','VARIABLE'),),max_length=8)
     Distance = models.IntegerField(verbose_name="Distance(Kms)",validators=[MinValueValidator(0)])

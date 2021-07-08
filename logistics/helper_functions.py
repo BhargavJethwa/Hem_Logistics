@@ -4,6 +4,7 @@ from datetime import timedelta,datetime
 import json
 import pandas as pd
 
+
 def check_expiry_PUC():
     vehicles = Vehicle.objects.all()
 
@@ -55,11 +56,9 @@ def generate_trip_report(time_type,date1,date2):
         trips=Trip_detail.objects.filter(Date_created__gte=ini).filter(Date_created__lte=end)
         filename = "Trip_report-"+ini.strftime("%d-%m-%Y")+" to "+end.strftime("%d-%m-%Y")+".xlsx"
 
-    print(filename)
-
-    # 'Date', 'Client', 'RC Number', 'Driver', 'Rate', 'Distance', 'Freight', 'Path', 'U/L', 'Other', 'Advance', 'Total'
-
+    pd.io.formats.excel.ExcelFormatter.header_style = None
     Date=[]
+    trip_id=[]
     Client=[]
     RC=[]
     Driver=[]
@@ -74,47 +73,68 @@ def generate_trip_report(time_type,date1,date2):
     # writing the fields 
     for trip in trips:
         Date.append(trip.Date_created.strftime("%d/%m/%Y"))
+        trip_id.append(trip.Trip_id)
         Client.append(trip.Client)
         RC.append(trip.Vehicle)
         Driver.append(trip.Driver)
+        
         if(trip.Rate_type=="FIX"):
             Rate.append(trip.Rate_type)
         else:
             Rate.append(trip.Rate)
         Distance.append(str(trip.Distance)+" Km")
         Freight.append(trip.Freight)
-
-        path=""
-        path+=trip.Source+"\n"
-        UL=""
-        other=""
-        dest=json.loads(trip.Destination)
-        lu=json.loads(trip.Load_unload_charges)
-        oth=json.loads(trip.Other_charges)
-        for i in dest:
-            path+=i+"\n"
-        for i in lu:
-            UL+=i+"\n"
-        for i in oth:
-            other+=i+"\n"
-        path=path[:-1]
-        UL=UL[:-1]
-        other=other[:-1]
-
-        Path.append(path)
-        Unload_load.append(UL)
-        Other.append(other)
+        Path.append(trip.Source)
         Advance.append(trip.Advance_payment)
         Total.append(trip.Total_payment)
         
+        dest=json.loads(trip.Destination)
+        lu=json.loads(trip.Load_unload_charges)
+        oth=json.loads(trip.Other_charges)
+
+        for i in dest:
+            Date.append(trip.Date_created.strftime("%d/%m/%Y"))
+            trip_id.append(trip.Trip_id)
+            Client.append(trip.Client)
+            RC.append(trip.Vehicle)
+            Driver.append(trip.Driver)            
+            if(trip.Rate_type=="FIX"):
+                Rate.append(trip.Rate_type)
+            else:
+                Rate.append(trip.Rate)
+            Distance.append(str(trip.Distance)+" Km")
+            Freight.append(trip.Freight)
+            Path.append(i)
+            Advance.append(trip.Advance_payment)
+            Total.append(trip.Total_payment)
+
+        for i in lu:
+            Unload_load.append(int(i))
+        
+        for i in oth:
+            Other.append(int(i))
+
+        
+        
     # Create a Pandas dataframe from the data.
-    df = pd.DataFrame({'Date':Date, 'Client':Client, 'RC Number':RC, 'Driver':Driver, 'Rate':Rate, 'Distance':Distance, 'Freight':Freight, 'Path':Path, 'U/L':Unload_load, 'Other':Other, 'Advance':Advance, 'Total':Total})
-    df=df.set_index('Date')
+    df = pd.DataFrame({'Date':Date, 'Trip ID':trip_id ,'Client':Client, 'RC Number':RC, 'Driver':Driver, 'Rate':Rate, 'Distance':Distance, 'Freight':Freight, 'Path':Path, 'U/L':Unload_load, 'Other':Other, 'Advance':Advance, 'Total':Total})
+    df=df.groupby(['Date', 'Trip ID', 'Client', 'RC Number', 'Driver', 'Rate', 'Distance', 'Freight','Advance', 'Total', 'Path', 'U/L', 'Other']).sum()
+
     # Create a Pandas Excel writer using XlsxWriter as the engine.
     writer = pd.ExcelWriter(filename, engine='xlsxwriter')
+    workbook  = writer.book
 
     # Convert the dataframe to an XlsxWriter Excel object.
     df.to_excel(writer, sheet_name='Sheet1')
+
+    worksheet = writer.sheets['Sheet1']
+    format = workbook.add_format({'align': 'center', 'valign': 'vcenter','text_wrap':False})
+
+    # format.set_bold(False)
+    worksheet.set_column('A:M',None, format)
+
+    header_fmt = workbook.add_format({'bold': True,'align': 'center', 'valign': 'vcenter'})
+    worksheet.set_row(1, None, header_fmt)
 
     # Close the Pandas Excel writer and output the Excel file.
     writer.save()
@@ -128,11 +148,14 @@ def Vehicle_report(vehicle,month):
     trips=Trip_detail.objects.filter(Date_created__month=ini.month).filter(Date_created__year=ini.year).filter(Vehicle=v)
     
     filename = "Vehicle_report-"+ini.strftime("%m-%Y")+".xlsx"
-    print(filename)
+    # print(filename)
 
     # 'Date', 'Client', 'RC Number', 'Driver', 'Rate', 'Distance', 'Freight', 'Path', 'U/L', 'Other', 'Advance', 'Total'
 
+    
+    pd.io.formats.excel.ExcelFormatter.header_style = None
     Date=[]
+    trip_id=[]
     Client=[]
     RC=[]
     Driver=[]
@@ -147,47 +170,68 @@ def Vehicle_report(vehicle,month):
     # writing the fields 
     for trip in trips:
         Date.append(trip.Date_created.strftime("%d/%m/%Y"))
+        trip_id.append(trip.Trip_id)
         Client.append(trip.Client)
         RC.append(trip.Vehicle)
         Driver.append(trip.Driver)
+        
         if(trip.Rate_type=="FIX"):
             Rate.append(trip.Rate_type)
         else:
             Rate.append(trip.Rate)
         Distance.append(str(trip.Distance)+" Km")
         Freight.append(trip.Freight)
-
-        path=""
-        path+=trip.Source+"\n"
-        UL=""
-        other=""
-        dest=json.loads(trip.Destination)
-        lu=json.loads(trip.Load_unload_charges)
-        oth=json.loads(trip.Other_charges)
-        for i in dest:
-            path+=i+"\n"
-        for i in lu:
-            UL+=i+"\n"
-        for i in oth:
-            other+=i+"\n"
-        path=path[:-1]
-        UL=UL[:-1]
-        other=other[:-1]
-
-        Path.append(path)
-        Unload_load.append(UL)
-        Other.append(other)
+        Path.append(trip.Source)
         Advance.append(trip.Advance_payment)
         Total.append(trip.Total_payment)
         
+        dest=json.loads(trip.Destination)
+        lu=json.loads(trip.Load_unload_charges)
+        oth=json.loads(trip.Other_charges)
+
+        for i in dest:
+            Date.append(trip.Date_created.strftime("%d/%m/%Y"))
+            trip_id.append(trip.Trip_id)
+            Client.append(trip.Client)
+            RC.append(trip.Vehicle)
+            Driver.append(trip.Driver)            
+            if(trip.Rate_type=="FIX"):
+                Rate.append(trip.Rate_type)
+            else:
+                Rate.append(trip.Rate)
+            Distance.append(str(trip.Distance)+" Km")
+            Freight.append(trip.Freight)
+            Path.append(i)
+            Advance.append(trip.Advance_payment)
+            Total.append(trip.Total_payment)
+
+        for i in lu:
+            Unload_load.append(int(i))
+        
+        for i in oth:
+            Other.append(int(i))
+
+        
+        
     # Create a Pandas dataframe from the data.
-    df = pd.DataFrame({'Date':Date, 'Client':Client, 'RC Number':RC, 'Driver':Driver, 'Rate':Rate, 'Distance':Distance, 'Freight':Freight, 'Path':Path, 'U/L':Unload_load, 'Other':Other, 'Advance':Advance, 'Total':Total})
-    df=df.set_index('Date')
+    df = pd.DataFrame({'Date':Date, 'Trip ID':trip_id ,'Client':Client, 'RC Number':RC, 'Driver':Driver, 'Rate':Rate, 'Distance':Distance, 'Freight':Freight, 'Path':Path, 'U/L':Unload_load, 'Other':Other, 'Advance':Advance, 'Total':Total})
+    df=df.groupby(['Date', 'Trip ID', 'Client', 'RC Number', 'Driver', 'Rate', 'Distance', 'Freight','Advance', 'Total', 'Path', 'U/L', 'Other']).sum()
+
     # Create a Pandas Excel writer using XlsxWriter as the engine.
     writer = pd.ExcelWriter(filename, engine='xlsxwriter')
+    workbook  = writer.book
 
     # Convert the dataframe to an XlsxWriter Excel object.
     df.to_excel(writer, sheet_name='Sheet1')
+
+    worksheet = writer.sheets['Sheet1']
+    format = workbook.add_format({'align': 'center', 'valign': 'vcenter','text_wrap':False})
+
+    # format.set_bold(False)
+    worksheet.set_column('A:M',None, format)
+
+    header_fmt = workbook.add_format({'bold': True,'align': 'center', 'valign': 'vcenter'})
+    worksheet.set_row(1, None, header_fmt)
 
     # Close the Pandas Excel writer and output the Excel file.
     writer.save()
